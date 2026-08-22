@@ -1,0 +1,9 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# k3s ships with the servicelb (Klipper) load balancer and the local-path
+# storage provisioner out of the box, so no extra controllers are needed here.
+# If you disabled those k3s components, add MetalLB / a storage provisioner like
+# the pc-k8s overlay does.
+resources:
+  - ../base

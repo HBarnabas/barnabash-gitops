@@ -1,0 +1,20 @@
+# SOPS configuration for encrypting Kubernetes Secrets with age.
+#
+# Setup (once):
+#   1. Install age + sops locally.
+#   2. Generate a key:            age-keygen -o age.key
+#   3. Put the PUBLIC key below (replace the placeholder).
+#   4. Create the in-cluster decryption key AFTER bootstrap:
+#        cat age.key | kubectl create secret generic sops-age \
+#          -n flux-system --from-file=age.agekey=/dev/stdin
+#
+# Encrypt a secret file:  sops --encrypt --in-place path/to/secret.sops.yaml
+# Edit an encrypted file: sops path/to/secret.sops.yaml
+#
+# Any file matching *.sops.yaml is encrypted; only `data`/`stringData` values
+# are encrypted so the manifest stays diff-friendly.
+creation_rules:
+  - path_regex: .*\.sops\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    # TODO: replace with the PUBLIC key printed by `age-keygen`.
+    age: age1REPLACE_ME_WITH_YOUR_AGE_PUBLIC_KEY

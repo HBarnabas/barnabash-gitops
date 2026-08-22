@@ -1,0 +1,43 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: minecraft
+  namespace: minecraft
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: minecraft
+      # TODO: check https://artifacthub.io/packages/helm/minecraft-server-charts/minecraft
+      version: "4.26.3"
+      sourceRef:
+        kind: HelmRepository
+        name: itzg
+        namespace: flux-system
+  values:
+    minecraftServer:
+      eula: "TRUE"
+      type: PAPER # PAPER = good performance + plugins; use VANILLA/FABRIC/FORGE as needed
+      version: LATEST
+      difficulty: normal
+      # Expose so friends can connect. LoadBalancer gets a dedicated IP
+      # (k3s servicelb / MetalLB). Switch to NodePort if you prefer.
+      serviceType: LoadBalancer
+      # RCON password comes from a SOPS-encrypted secret (see secret.sops.yaml).
+      rcon:
+        enabled: true
+        existingSecret: minecraft-rcon
+      # Ops / whitelist — put your and friends' usernames/UUIDs here.
+      ops: ""
+      whitelist: ""
+      overrideServerProperties: true
+      memory: 2G # bump on pc-k8s via overlay patch
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2560Mi
+    persistence:
+      dataDir:
+        enabled: true
+        existingClaim: minecraft-data

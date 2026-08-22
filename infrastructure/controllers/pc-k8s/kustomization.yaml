@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Full k8s on PC hardware: inherit the shared controllers and add a bare-metal
+# load balancer (MetalLB). Storage: install a provisioner that gives you a
+# `local-path` StorageClass so app manifests stay identical to the k3s cluster.
+# The easiest options:
+#   * Rancher local-path-provisioner (kubectl apply the upstream manifest), or
+#   * Longhorn / OpenEBS if you want replicated storage across nodes.
+# See infrastructure/controllers/pc-k8s/README.md.
+resources:
+  - ../base
+  - namespace.yaml
+  - metallb.yaml

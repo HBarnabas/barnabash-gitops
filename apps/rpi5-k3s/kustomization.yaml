@@ -1,0 +1,21 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Raspberry Pi 5 + k3s. ARM64, limited RAM, so keep footprints modest.
+# Everything inherits the shared app base; add patchesStrategicMerge / patches
+# here to trim resources or disable heavy apps as needed.
+resources:
+  - ../base
+patches:
+  # Give Minecraft a bit less headroom on the Pi.
+  - target:
+      kind: HelmRelease
+      name: minecraft
+      namespace: minecraft
+    patch: |
+      - op: replace
+        path: /spec/values/minecraftServer/memory
+        value: "1536M"
+      - op: replace
+        path: /spec/values/resources/requests/memory
+        value: "2Gi"

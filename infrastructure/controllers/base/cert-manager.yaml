@@ -1,0 +1,30 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: cert-manager
+      # TODO: check https://artifacthub.io/packages/helm/cert-manager/cert-manager
+      # for the latest version before bootstrapping.
+      version: "v1.16.2"
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack
+        namespace: flux-system
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    crds:
+      enabled: true
+    # Small footprint that is fine on a Raspberry Pi and scales up on a PC.
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi

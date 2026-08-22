@@ -1,0 +1,15 @@
+---
+# Persistent storage for the Immich photo/video library.
+# NOTE: on the pc-k8s cluster this is patched to a larger size; adjust to taste.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-library
+  namespace: immich
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 50Gi

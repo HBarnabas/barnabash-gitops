@@ -1,0 +1,24 @@
+---
+# Application workloads for this cluster. Depends on infra-configs so that
+# ingress, TLS issuers and storage are ready before apps roll out.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: infra-configs
+  interval: 1h
+  retryInterval: 1m
+  timeout: 10m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/rpi5-k3s
+  prune: true
+  wait: true
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

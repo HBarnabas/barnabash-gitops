@@ -1,0 +1,17 @@
+# Secrets / keys — NEVER commit these
+*.agekey
+age.key
+*.dec.yaml
+*.decrypted.yaml
+.decrypted~*
+sops-age.key
+
+# kubeconfig
+kubeconfig
+*.kubeconfig
+
+# local tooling
+.DS_Store
+*.swp
+.idea/
+.vscode/

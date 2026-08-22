@@ -1,0 +1,45 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Full k8s on PC hardware. More CPU/RAM/disk available, so scale things up.
+resources:
+  - ../base
+patches:
+  # Larger Immich photo library.
+  - target:
+      kind: PersistentVolumeClaim
+      name: immich-library
+      namespace: immich
+    patch: |
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: "500Gi"
+  # Larger media library + download space.
+  - target:
+      kind: PersistentVolumeClaim
+      name: media-library
+      namespace: media
+    patch: |
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: "2Ti"
+  - target:
+      kind: PersistentVolumeClaim
+      name: qbittorrent-downloads
+      namespace: downloads
+    patch: |
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: "500Gi"
+  # More headroom for the Minecraft server.
+  - target:
+      kind: HelmRelease
+      name: minecraft
+      namespace: minecraft
+    patch: |
+      - op: replace
+        path: /spec/values/minecraftServer/memory
+        value: "6G"
+      - op: replace
+        path: /spec/values/resources/requests/memory
+        value: "7Gi"

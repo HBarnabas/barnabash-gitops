@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+# The media library. For a real setup back this with a big disk / NFS export.
+# If you want the download client to drop files straight into this library,
+# use an RWX (e.g. NFS) StorageClass and mount the same volume there, or run
+# both apps in one namespace. See README.md.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-library
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 100Gi

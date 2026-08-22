@@ -1,0 +1,61 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: immich
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: immich
+      # TODO: check https://artifacthub.io/packages/helm/immich/immich
+      version: "0.9.3"
+      sourceRef:
+        kind: HelmRepository
+        name: immich
+        namespace: flux-system
+  # Immich needs a PostgreSQL database with the VectorChord/pgvecto-rs extension.
+  # The Helm chart does NOT ship Postgres — see README.md in this folder for how
+  # to deploy it (CloudNativePG or the tensorchord/pgvecto-rs image). Redis is
+  # bundled by the chart and enabled below.
+  values:
+    env:
+      # Connection info for your Postgres instance. DB_PASSWORD comes from the
+      # immich-db secret (see secret.sops.yaml) via envFrom below is not enough
+      # for the chart, so we also reference it here.
+      DB_HOSTNAME: immich-postgres
+      DB_DATABASE_NAME: immich
+      DB_USERNAME: immich
+      DB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: immich-db
+            key: password
+    image:
+      tag: v1.119.0 # TODO: pin to the Immich release you want to run.
+    immich:
+      persistence:
+        library:
+          existingClaim: immich-library
+    redis:
+      enabled: true
+    # The chart's optional bundled postgresql is intentionally left disabled;
+    # manage Postgres separately so backups/upgrades are under your control.
+    postgresql:
+      enabled: false
+    server:
+      ingress:
+        main:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-staging
+          ingressClassName: nginx
+          hosts:
+            - host: immich.example.com # TODO: your domain
+              paths:
+                - path: /
+          tls:
+            - secretName: immich-tls
+              hosts:
+                - immich.example.com # TODO: your domain

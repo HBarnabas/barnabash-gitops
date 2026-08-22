@@ -1,0 +1,38 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: immich
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://immich-app.github.io/immich-charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jellyfin
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://jellyfin.github.io/jellyfin-helm
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: itzg
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://itzg.github.io/minecraft-server-charts
+---
+# bjw-s app-template: a flexible generic chart used here for qBittorrent.
+# It's the de-facto standard for self-hosted apps that lack a good official chart.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: bjw-s
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://bjw-s-labs.github.io/helm-charts
