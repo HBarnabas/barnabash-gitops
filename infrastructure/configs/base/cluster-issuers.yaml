@@ -13,7 +13,7 @@ spec:
   acme:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     # TODO: set your email address.
-    email: you@example.com
+    email: hbarnabas@outlook.com
     privateKeySecretRef:
       name: letsencrypt-staging-account-key
     solvers:
@@ -29,7 +29,7 @@ spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
     # TODO: set your email address.
-    email: you@example.com
+    email: hbarnabas@outlook.com
     privateKeySecretRef:
       name: letsencrypt-prod-account-key
     solvers:
