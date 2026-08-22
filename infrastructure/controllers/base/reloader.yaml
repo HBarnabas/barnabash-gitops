@@ -12,7 +12,7 @@ spec:
     spec:
       chart: reloader
       # TODO: check https://artifacthub.io/packages/helm/stakater/reloader
-      version: "1.4.0"
+      version: "2.2.15"
       sourceRef:
         kind: HelmRepository
         name: stakater
