@@ -30,7 +30,7 @@ spec:
         existingSecret: minecraft-rcon
       # Ops / whitelist — put your and friends' usernames/UUIDs here.
       ops: ""
-      whitelist: ",HerrLinks,Joko11222,Barnovskij"
+      whitelist: "HerrLinks,Joko11222,Barnovskij"
       overrideServerProperties: true
       memory: 2G # bump on pc-k8s via overlay patch
     resources:
