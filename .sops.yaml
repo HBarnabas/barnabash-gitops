@@ -17,4 +17,4 @@ creation_rules:
   - path_regex: .*\.sops\.yaml$
     encrypted_regex: ^(data|stringData)$
     # TODO: replace with the PUBLIC key printed by `age-keygen`.
-    age: age1REPLACE_ME_WITH_YOUR_AGE_PUBLIC_KEY
+    age: age1mskvtzf73xl8nxh5lt6ea3llxzmdar7sctsxwz3ymjnv8sw3ev5s99r353
