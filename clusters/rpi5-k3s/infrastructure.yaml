@@ -16,10 +16,6 @@ spec:
   path: ./infrastructure/controllers/rpi5-k3s
   prune: true
   wait: true
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
 ---
 # Cluster-scoped configuration (ClusterIssuers, MetalLB pools, ...).
 # Depends on the controllers being installed and healthy first.
@@ -39,7 +35,3 @@ spec:
     name: flux-system
   path: ./infrastructure/configs/rpi5-k3s
   prune: true
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
