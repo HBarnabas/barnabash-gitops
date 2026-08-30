@@ -22,7 +22,7 @@ spec:
             fsGroup: 65532
           containers:
             - name: ddns
-              image: google/cloud-sdk:slim # multi-arch (arm64 ok on the Pi)
+              image: gcr.io/google.com/cloudsdktool/google-cloud-cli:565.0.0-slim # multi-arch (arm64 ok on the Pi)
               command: ["bash", "/scripts/update-ip.bash"]
               envFrom:
                 - configMapRef:
