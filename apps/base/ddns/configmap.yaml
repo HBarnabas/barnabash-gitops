@@ -1,0 +1,59 @@
+---
+# Non-secret configuration for the Dynamic DNS updater. Edit these values.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddns-config
+  namespace: ddns
+data:
+  PROJECT_ID: "org-ops-barnabash-com" # TODO: your GCP project
+  ZONE_NAME: "barnabash" # TODO: your Cloud DNS managed zone name
+  # Space-separated, fully-qualified record names (trailing dot recommended).
+  RECORDS_TO_UPDATE: "rpi5.barnabash.com. fluxer.barnabash.com." # TODO: your record(s)
+  TTL_SECONDS: "1800"
+  IP_SOURCE_URL: "https://ifconfig.me"
+---
+# The updater script (adapted from HBarnabas/update-dynamic-ip to run statelessly
+# in-cluster: it compares the current public IP against the live record instead
+# of a local last-ip.txt, so no PVC is needed).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddns-script
+  namespace: ddns
+data:
+  update-ip.bash: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    : "${PROJECT_ID:?Missing PROJECT_ID}"
+    : "${ZONE_NAME:?Missing ZONE_NAME}"
+    : "${RECORDS_TO_UPDATE:?Missing RECORDS_TO_UPDATE}"
+    : "${GOOGLE_APPLICATION_CREDENTIALS:?Missing GOOGLE_APPLICATION_CREDENTIALS}"
+    TTL_SECONDS="${TTL_SECONDS:-1800}"
+    IP_SOURCE_URL="${IP_SOURCE_URL:-https://ifconfig.me}"
+
+    gcloud auth activate-service-account \
+      --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+
+    current_ip="$(curl -4 -fsS "$IP_SOURCE_URL" | tr -d '[:space:]')"
+    if [[ -z "$current_ip" ]]; then
+      echo "ERROR: could not determine public IP" >&2
+      exit 1
+    fi
+    echo "Current public IP: $current_ip"
+
+    for record in $RECORDS_TO_UPDATE; do
+      existing="$(gcloud dns record-sets list \
+        --project="$PROJECT_ID" --zone="$ZONE_NAME" \
+        --name="$record" --type=A \
+        --format='value(rrdatas[0])' 2>/dev/null || true)"
+      if [[ "$current_ip" == "$existing" ]]; then
+        echo "$record already up to date ($current_ip)"
+        continue
+      fi
+      echo "Updating $record: ${existing:-<none>} -> $current_ip"
+      gcloud dns --project="$PROJECT_ID" record-sets update "$record" \
+        --type=A --zone="$ZONE_NAME" \
+        --rrdatas="$current_ip" --ttl="$TTL_SECONDS"
+    done

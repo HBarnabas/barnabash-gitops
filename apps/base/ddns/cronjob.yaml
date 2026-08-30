@@ -1,0 +1,63 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ddns-updater
+  namespace: ddns
+spec:
+  # Every 15 minutes. Adjust as you like.
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 120
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            fsGroup: 65532
+          containers:
+            - name: ddns
+              image: google/cloud-sdk:slim # multi-arch (arm64 ok on the Pi)
+              command: ["bash", "/scripts/update-ip.bash"]
+              envFrom:
+                - configMapRef:
+                    name: ddns-config
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /var/secrets/gcp/key.json
+                # gcloud needs a writable config dir.
+                - name: CLOUDSDK_CONFIG
+                  value: /tmp/gcloud
+                - name: HOME
+                  value: /tmp
+              volumeMounts:
+                - name: script
+                  mountPath: /scripts
+                  readOnly: true
+                - name: gcp-key
+                  mountPath: /var/secrets/gcp
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+                limits:
+                  memory: 128Mi
+          volumes:
+            - name: script
+              configMap:
+                name: ddns-script
+                defaultMode: 0755
+            - name: gcp-key
+              secret:
+                secretName: ddns-gcp-key
+            - name: tmp
+              emptyDir: {}
