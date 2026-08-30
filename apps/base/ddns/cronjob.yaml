@@ -5,8 +5,7 @@ metadata:
   name: ddns-updater
   namespace: ddns
 spec:
-  # Every 15 minutes. Adjust as you like.
-  schedule: "*/15 * * * *"
+  schedule: "* * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
