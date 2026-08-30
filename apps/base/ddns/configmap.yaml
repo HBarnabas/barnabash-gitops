@@ -32,9 +32,7 @@ data:
     : "${GOOGLE_APPLICATION_CREDENTIALS:?Missing GOOGLE_APPLICATION_CREDENTIALS}"
     TTL_SECONDS="${TTL_SECONDS:-1800}"
     IP_SOURCE_URL="${IP_SOURCE_URL:-https://ifconfig.me}"
-
-    gcloud auth activate-service-account \
-      --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
+    STATE_FILE="${STATE_FILE:-/state/last-ip.txt}"
 
     current_ip="$(curl -4 -fsS "$IP_SOURCE_URL" | tr -d '[:space:]')"
     if [[ -z "$current_ip" ]]; then
@@ -42,6 +40,17 @@ data:
       exit 1
     fi
     echo "Current public IP: $current_ip"
+
+    # Fast path: if the state file already matches, do nothing and skip all
+    # Cloud DNS API calls entirely.
+    last_ip="$(cat "$STATE_FILE" 2>/dev/null || true)"
+    if [[ "$current_ip" == "$last_ip" ]]; then
+      echo "Unchanged since last run ($current_ip); nothing to do."
+      exit 0
+    fi
+
+    gcloud auth activate-service-account \
+      --key-file="$GOOGLE_APPLICATION_CREDENTIALS" >/dev/null
 
     for record in $RECORDS_TO_UPDATE; do
       existing="$(gcloud dns record-sets list \
@@ -57,3 +66,6 @@ data:
         --type=A --zone="$ZONE_NAME" \
         --rrdatas="$current_ip" --ttl="$TTL_SECONDS"
     done
+
+    # Remember this IP so subsequent unchanged runs are a no-op (no API calls).
+    printf '%s' "$current_ip" > "$STATE_FILE"

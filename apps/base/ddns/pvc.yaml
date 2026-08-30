@@ -1,0 +1,15 @@
+---
+# Tiny persistent volume to remember the last public IP between runs, so the
+# updater only calls the Cloud DNS API when the IP actually changed (mirrors the
+# original last-ip.txt behavior). On k3s this binds via local-path (node-local).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ddns-state
+  namespace: ddns
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 16Mi

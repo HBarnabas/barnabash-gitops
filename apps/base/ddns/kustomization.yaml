@@ -6,4 +6,5 @@ resources:
   - namespace.yaml
   - configmap.yaml
   - secret.sops.yaml
+  - pvc.yaml
   - cronjob.yaml

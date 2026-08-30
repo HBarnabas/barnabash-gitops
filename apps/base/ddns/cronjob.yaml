@@ -44,6 +44,8 @@ spec:
                   readOnly: true
                 - name: tmp
                   mountPath: /tmp
+                - name: state
+                  mountPath: /state
               resources:
                 requests:
                   cpu: 10m
@@ -60,3 +62,6 @@ spec:
                 secretName: ddns-gcp-key
             - name: tmp
               emptyDir: {}
+            - name: state
+              persistentVolumeClaim:
+                claimName: ddns-state
