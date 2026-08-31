@@ -7,6 +7,7 @@ metadata:
 spec:
   # Newer Immich charts (>= 0.13.x, app v3.x) are published only as OCI
   # artifacts, not to the classic HTTP index.
+  type: oci
   interval: 24h
   url: oci://ghcr.io/immich-app/immich-charts/
 ---
