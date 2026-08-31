@@ -46,7 +46,16 @@ spec:
 
     server:
       enabled: true
-      # Local access only for now — no ingress. Reach it via port-forward.
+      # NodePort gives a stable <node-ip>:30283 endpoint that survives pod
+      # restarts (the Service routes to whatever replica is Ready), unlike
+      # `kubectl port-forward` which is pinned to one pod.
+      service:
+        main:
+          type: NodePort
+          ports:
+            http:
+              nodePort: 30283
+      # Local access only for now — no ingress. Reach it via <node-ip>:30283.
       ingress:
         main:
           enabled: false
