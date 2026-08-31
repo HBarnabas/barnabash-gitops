@@ -5,8 +5,11 @@ metadata:
   name: immich
   namespace: flux-system
 spec:
+  # Newer Immich charts (>= 0.13.x, app v3.x) are published only as OCI
+  # artifacts, not to the classic HTTP index.
+  type: oci
   interval: 24h
-  url: https://immich-app.github.io/immich-charts
+  url: oci://ghcr.io/immich-app/immich-charts
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
