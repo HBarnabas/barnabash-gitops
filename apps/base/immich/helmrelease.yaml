@@ -53,6 +53,7 @@ spec:
           type: NodePort
           ports:
             http:
+              port: 2283
               nodePort: 30283
       # Local access only for now — no ingress. Reach it via <node-ip>:30283.
       ingress:
