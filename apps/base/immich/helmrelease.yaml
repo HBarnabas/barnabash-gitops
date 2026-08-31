@@ -1,0 +1,56 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: immich
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: immich
+      version: "0.12.0"
+      sourceRef:
+        kind: HelmRepository
+        name: immich
+        namespace: flux-system
+  values:
+    # Shared config for the Immich components.
+    controllers:
+      main:
+        containers:
+          main:
+            env:
+              # --- Database (points at the StatefulSet in this namespace) ---
+              DB_HOSTNAME: immich-postgres
+              DB_USERNAME: immich
+              DB_DATABASE_NAME: immich
+              DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-db
+                    key: password
+              # Machine learning disabled for now to keep the Pi light while we
+              # set things up. Flip to "true" + machine-learning.enabled below to
+              # get smart search / face recognition later.
+              IMMICH_MACHINE_LEARNING_ENABLED: "false"
+
+    immich:
+      persistence:
+        library:
+          existingClaim: immich-library
+
+    # Bundled Redis-compatible cache (job queues). Lightweight.
+    valkey:
+      enabled: true
+
+    server:
+      enabled: true
+      # Local access only for now — no ingress. Reach it via port-forward.
+      ingress:
+        main:
+          enabled: false
+
+    # Off for now (heavy on a Pi). Enable later once the basics work.
+    machine-learning:
+      enabled: false

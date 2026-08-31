@@ -1,4 +1,6 @@
 ---
+# Jellyfin config/metadata stays on the SSD (fast local-path) -- it's small and
+# benefits from fast random IO.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,10 +14,24 @@ spec:
     requests:
       storage: 10Gi
 ---
-# The media library. For a real setup back this with a big disk / NFS export.
-# If you want the download client to drop files straight into this library,
-# use an RWX (e.g. NFS) StorageClass and mount the same volume there, or run
-# both apps in one namespace. See README.md.
+# The media library lives on the 2TB HDD (/mnt/hdd/media) via the shared `hdd`
+# StorageClass -- this is where the existing media data on the drive goes.
+# hostPath size is informational only; it shares the HDD's free space.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-library
+spec:
+  capacity:
+    storage: 1000Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hdd
+  hostPath:
+    path: /mnt/hdd/media
+    type: DirectoryOrCreate
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -24,7 +40,8 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: hdd
+  volumeName: media-library
   resources:
     requests:
-      storage: 100Gi
+      storage: 1000Gi

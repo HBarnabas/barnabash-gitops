@@ -1,0 +1,42 @@
+---
+# Shared StorageClass for the node's 2TB HDD (mounted at /mnt/hdd).
+#
+# It is a "no-provisioner" (static) class: nothing is auto-created. For each
+# purpose you hand-create a PV pointing at a subdirectory of /mnt/hdd, plus a
+# PVC (in the app's namespace) that binds to it via `volumeName`.
+#
+# NOTE: hostPath capacity is NOT enforced -- the `storage` numbers are labels
+# only. All volumes share the same ext4 filesystem and its free space.
+#
+# ---- Reusable pattern (copy per app) --------------------------------------
+#   apiVersion: v1
+#   kind: PersistentVolume
+#   metadata:
+#     name: <app>-<purpose>            # cluster-scoped, globally unique
+#   spec:
+#     capacity: { storage: <size> }    # informational for hostPath
+#     accessModes: [ReadWriteOnce]
+#     persistentVolumeReclaimPolicy: Retain
+#     storageClassName: hdd
+#     hostPath:
+#       path: /mnt/hdd/<app>           # subdirectory on the HDD
+#       type: DirectoryOrCreate
+#   ---
+#   apiVersion: v1
+#   kind: PersistentVolumeClaim
+#   metadata:
+#     name: <app>-<purpose>
+#     namespace: <app-namespace>
+#   spec:
+#     accessModes: [ReadWriteOnce]
+#     storageClassName: hdd
+#     volumeName: <app>-<purpose>      # binds directly to the PV above
+#     resources: { requests: { storage: <size> } }
+# ---------------------------------------------------------------------------
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: hdd
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: Immediate
+reclaimPolicy: Retain

@@ -1,0 +1,38 @@
+---
+# Immich photo/video library on the 2TB HDD (mounted at /mnt/hdd on the node),
+# using the shared `hdd` StorageClass. Subdirectory: /mnt/hdd/immich/library.
+# The HDD MUST be mounted at /mnt/hdd BEFORE Immich starts, otherwise files
+# would be written to the SSD root.
+#
+# NOTE: with hostPath the `storage` size is NOT enforced -- it is a label only.
+# Immich grows into the HDD's free space; the rest stays available for other
+# volumes (e.g. media). Data lives at /mnt/hdd/immich/library on the filesystem;
+# deleting/recreating these objects does NOT delete files (reclaimPolicy Retain).
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-library
+spec:
+  capacity:
+    storage: 300Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hdd
+  hostPath:
+    path: /mnt/hdd/immich/library
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-library
+  namespace: immich
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hdd
+  volumeName: immich-library
+  resources:
+    requests:
+      storage: 300Gi
