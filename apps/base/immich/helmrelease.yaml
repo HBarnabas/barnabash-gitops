@@ -6,14 +6,13 @@ metadata:
   namespace: immich
 spec:
   interval: 1h
-  chart:
-    spec:
-      chart: immich
-      version: "0.13.1"
-      sourceRef:
-        kind: OCIRepository
-        name: immich
-        namespace: flux-system
+  # OCIRepository charts are referenced via chartRef (not chart.spec, which only
+  # accepts HelmRepository/GitRepository/Bucket sources). The chart version/tag
+  # is pinned on the OCIRepository itself.
+  chartRef:
+    kind: OCIRepository
+    name: immich
+    namespace: flux-system
   values:
     # Shared config for the Immich components.
     controllers:

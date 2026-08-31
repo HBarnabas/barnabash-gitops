@@ -6,9 +6,13 @@ metadata:
   namespace: flux-system
 spec:
   # Newer Immich charts (>= 0.13.x, app v3.x) are published only as OCI
-  # artifacts, not to the classic HTTP index.
+  # artifacts, not to the classic HTTP index. An OCIRepository points at the
+  # full chart path (incl. chart name) and a specific tag; the HelmRelease
+  # consumes it via chartRef.
   interval: 24h
-  url: oci://ghcr.io/immich-app/immich-charts/
+  url: oci://ghcr.io/immich-app/immich-charts/immich
+  ref:
+    tag: "0.13.1"
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
