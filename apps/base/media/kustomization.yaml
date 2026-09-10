@@ -9,4 +9,5 @@ resources:
   - prowlarr.yaml
   - sonarr.yaml
   - radarr.yaml
+  - byparr.yaml
   - jellyfin.yaml
