@@ -1,0 +1,14 @@
+---
+# Small volume to persist wg-easy state (server keys + generated peer configs)
+# across pod restarts. Kept on the SSD (default local-path StorageClass).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wireguard-config
+  namespace: wireguard
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 64Mi

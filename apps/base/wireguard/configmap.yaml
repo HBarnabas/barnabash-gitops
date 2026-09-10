@@ -1,0 +1,41 @@
+---
+# Non-secret configuration for wg-easy (the WireGuard server + web UI).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wireguard-config
+  namespace: wireguard
+data:
+  # Public endpoint clients dial. Must resolve to your public IP -- add a
+  # `vpn.barnabash.com` A record to the DDNS RECORDS_TO_UPDATE so it tracks
+  # your dynamic IP. Clients bake this into their peer config as the endpoint.
+  WG_HOST: "vpn.barnabash.com" # TODO: confirm/point this domain at your public IP
+
+  # UDP port clients connect to (advertised in peer configs). Forward this port
+  # (UDP) on your router to the Pi. hostNetwork means the pod listens on the
+  # host directly, so the router forward is a straight 51820/udp -> Pi:51820.
+  WG_PORT: "51820"
+
+  # THE SPLIT-TUNNEL SETTING. This becomes AllowedIPs in every generated peer
+  # config: only traffic to your LAN goes through the tunnel; all other phone/
+  # laptop traffic goes out normally. Add more CIDRs (comma-separated) later if
+  # you want to reach additional subnets. To make it a FULL tunnel instead, use
+  # "0.0.0.0/0, ::/0".
+  WG_ALLOWED_IPS: "192.168.0.0/24"
+
+  # DNS handed to clients. Pointing at your router lets you use LAN hostnames
+  # over the tunnel; accessing services by IP (e.g. Immich at 192.168.0.77)
+  # works regardless. It's in the AllowedIPs range, so queries route correctly.
+  WG_DEFAULT_DNS: "192.168.0.1"
+
+  # Internal VPN subnet for peers (server is .1). Default is fine.
+  WG_DEFAULT_ADDRESS: "10.8.0.x"
+
+  # Keepalive helps NAT traversal so the tunnel stays reachable behind CGNAT/NAT.
+  WG_PERSISTENT_KEEPALIVE: "25"
+
+  # The Pi's LAN network interface. wg-easy masquerades VPN client traffic OUT
+  # this interface to reach your LAN (192.168.0.0/24), so it MUST match your
+  # actual wired interface. Verify on the Pi with:  ip route show default
+  # (look at 'dev <iface>'). Common on RPi5/Ubuntu: eth0 or end0.
+  WG_DEVICE: "eth0" # TODO: confirm with `ip route show default`

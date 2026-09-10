@@ -1,0 +1,69 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard
+  namespace: wireguard
+  labels:
+    app: wireguard
+spec:
+  replicas: 1
+  # Recreate (not RollingUpdate): a single hostNetwork pod owns UDP 51820 on the
+  # node, so two can't run at once during a rollout.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      # hostNetwork: the pod binds the node's 51820/udp (WireGuard) and
+      # 51821/tcp (web UI) directly. This preserves real client source IPs
+      # (needed for WireGuard roaming) and avoids UDP NodePort/double-NAT quirks.
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: wg-easy
+          image: ghcr.io/wg-easy/wg-easy:13 # multi-arch (arm64 ok on the Pi)
+          envFrom:
+            - configMapRef:
+                name: wireguard-config
+            - secretRef:
+                name: wireguard-secret
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN # manage the wg interface + routing
+                - SYS_MODULE # load the wireguard kernel module if needed
+          ports:
+            - name: wireguard
+              containerPort: 51820
+              protocol: UDP
+            - name: web-ui
+              containerPort: 51821
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /etc/wireguard
+            - name: modules
+              mountPath: /lib/modules
+              readOnly: true
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: wireguard-config
+        # Host kernel modules, so wg-easy can load the wireguard module if it
+        # isn't already built in/loaded on the node.
+        - name: modules
+          hostPath:
+            path: /lib/modules
+            type: Directory

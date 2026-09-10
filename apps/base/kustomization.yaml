@@ -9,3 +9,4 @@ resources:
   - ddns
   - immich
   - immich-backup
+  - wireguard
