@@ -9,7 +9,7 @@ data:
   PROJECT_ID: "org-ops-barnabash-com" # TODO: your GCP project
   ZONE_NAME: "barnabash" # TODO: your Cloud DNS managed zone name
   # Space-separated, fully-qualified record names (trailing dot recommended).
-  RECORDS_TO_UPDATE: "rpi5.barnabash.com. fluxer.barnabash.com." # TODO: your record(s)
+  RECORDS_TO_UPDATE: "rpi5.barnabash.com. fluxer.barnabash.com. vpn.barnabash.com." # TODO: your record(s)
   TTL_SECONDS: "1800"
   IP_SOURCE_URL: "https://ifconfig.me"
 ---
