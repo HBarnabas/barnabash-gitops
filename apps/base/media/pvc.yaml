@@ -1,6 +1,7 @@
 ---
-# Jellyfin config/metadata stays on the SSD (fast local-path) -- it's small and
-# benefits from fast random IO.
+# ---------------------------------------------------------------------------
+# Config volumes (small, fast) live on the SSD via the default local-path SC.
+# ---------------------------------------------------------------------------
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,36 +13,123 @@ spec:
   storageClassName: local-path
   resources:
     requests:
-      storage: 10Gi
+      storage: 5Gi
 ---
-# The media library lives on the 2TB HDD (/mnt/hdd/media) via the shared `hdd`
-# StorageClass -- this is where the existing media data on the drive goes.
-# hostPath size is informational only; it shares the HDD's free space.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qbittorrent-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prowlarr-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sonarr-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: radarr-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+# ---------------------------------------------------------------------------
+# Shared data volume on the 2TB HDD. ONE hostPath (/mnt/hdd/data) holding both
+# torrents/ and media/, mounted at /data into qBittorrent + Sonarr + Radarr so
+# hardlinks and instant atomic moves work (same filesystem). hostPath capacity
+# is informational; it shares the HDD's free space. Retain = data survives
+# PV/PVC recreation. RWO is fine: all pods run on the single node.
+# ---------------------------------------------------------------------------
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: media-library
+  name: media-data
 spec:
   capacity:
-    storage: 1000Gi
+    storage: 1500Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   storageClassName: hdd
   hostPath:
-    path: /mnt/hdd/media
+    path: /mnt/hdd/data
     type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: media-library
+  name: media-data
   namespace: media
 spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: hdd
-  volumeName: media-library
+  volumeName: media-data
   resources:
     requests:
-      storage: 1000Gi
+      storage: 1500Gi
+---
+# Jellyfin gets a narrower view: only the media/ subtree (read side), mounted at
+# /media. It never sees torrents/. Points at /mnt/hdd/data/media on the host.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-media
+spec:
+  capacity:
+    storage: 1500Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hdd
+  hostPath:
+    path: /mnt/hdd/data/media
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-media
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hdd
+  volumeName: jellyfin-media
+  resources:
+    requests:
+      storage: 1500Gi

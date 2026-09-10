@@ -1,0 +1,54 @@
+---
+# Sonarr — TV automation. Root folder /data/media/tv; imports from
+# /data/torrents via hardlink (same filesystem). Private, VPN-only.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sonarr
+  namespace: media
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: "5.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: ghcr.io/home-operations/sonarr
+              tag: 4.0.20
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+    service:
+      main:
+        controller: main
+        type: NodePort
+        ports:
+          http:
+            port: 8989
+            nodePort: 30989
+    persistence:
+      config:
+        existingClaim: sonarr-config
+        globalMounts:
+          - path: /config
+      data:
+        existingClaim: media-data
+        globalMounts:
+          - path: /data

@@ -5,4 +5,8 @@ namespace: media
 resources:
   - namespace.yaml
   - pvc.yaml
-  - helmrelease.yaml
+  - qbittorrent.yaml
+  - prowlarr.yaml
+  - sonarr.yaml
+  - radarr.yaml
+  - jellyfin.yaml

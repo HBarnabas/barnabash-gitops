@@ -1,0 +1,59 @@
+---
+# qBittorrent — download client (private, VPN-only). Saves into /data/torrents
+# on the HDD so *arr can hardlink into /data/media (same filesystem).
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: qbittorrent
+  namespace: media
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: "5.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    # Shared UID/GID across all media apps so hardlinks + file ownership on
+    # /data are consistent. The host dir /mnt/hdd/data must be chown'd to 1000.
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: ghcr.io/home-operations/qbittorrent
+              tag: 5.2.3
+            env:
+              UMASK: "022"
+              QBT_WEBUI_PORT: "8080"
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 1Gi
+    service:
+      main:
+        controller: main
+        type: NodePort
+        ports:
+          http:
+            port: 8080
+            nodePort: 30080
+    persistence:
+      config:
+        existingClaim: qbittorrent-config
+        globalMounts:
+          - path: /config
+      data:
+        existingClaim: media-data
+        globalMounts:
+          - path: /data

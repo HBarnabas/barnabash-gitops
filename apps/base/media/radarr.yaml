@@ -1,0 +1,54 @@
+---
+# Radarr — movie automation. Root folder /data/media/movies; imports from
+# /data/torrents via hardlink (same filesystem). Private, VPN-only.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: radarr
+  namespace: media
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: "5.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: ghcr.io/home-operations/radarr
+              tag: 5.28.0
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+    service:
+      main:
+        controller: main
+        type: NodePort
+        ports:
+          http:
+            port: 7878
+            nodePort: 30787
+    persistence:
+      config:
+        existingClaim: radarr-config
+        globalMounts:
+          - path: /config
+      data:
+        existingClaim: media-data
+        globalMounts:
+          - path: /data

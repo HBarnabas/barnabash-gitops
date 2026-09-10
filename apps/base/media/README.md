@@ -1,31 +1,59 @@
-# Media server
+# Media stack (private, VPN-only)
 
-Defaults to **Jellyfin** (fully FOSS, no account/license needed). Swap to Plex
-or Emby if you prefer:
+A hardlink-friendly \*arr + Jellyfin stack, all in the `media` namespace on the
+single Pi node. Reach each WebUI over the WireGuard tunnel (NodePorts):
 
-## Using Plex instead
+| App         | URL over VPN                | NodePort |
+|-------------|-----------------------------|----------|
+| Jellyfin    | http://<pi-ip>:30096        | 30096    |
+| qBittorrent | http://<pi-ip>:30080        | 30080    |
+| Prowlarr    | http://<pi-ip>:30696        | 30696    |
+| Sonarr      | http://<pi-ip>:30989        | 30989    |
+| Radarr      | http://<pi-ip>:30787        | 30787    |
 
-Replace `helmrelease.yaml` with a Plex chart, e.g. the `plex-media-server`
-chart (`https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages`) or the
-bjw-s `app-template` running `ghcr.io/linuxserver/plex`. Plex needs a claim
-token on first run (`PLEX_CLAIM`) — store it in a `*.sops.yaml` secret.
+## Storage layout (single filesystem = instant hardlinks)
 
-Keep the same `media-library` PVC so the rest of the repo is unchanged.
+```
+/mnt/hdd/data/
+  torrents/            qBittorrent save path (categories: tv, movies)
+  media/
+    movies/            Radarr root folder  -> Jellyfin library
+    tv/                Sonarr root folder  -> Jellyfin library
+```
 
-## Sharing the library with the download client
+- `media-data` PVC (hostPath `/mnt/hdd/data`) is mounted at `/data` in
+  qBittorrent, Sonarr and Radarr — so imports hardlink (no copy, no extra space)
+  and seeding continues from the same bytes.
+- `jellyfin-media` PVC (hostPath `/mnt/hdd/data/media`) is mounted at `/media`
+  in Jellyfin only (it never sees `torrents/`).
+- All apps run as UID/GID **1000** so ownership is consistent.
 
-PVCs are namespace-scoped and `local-path` is ReadWriteOnce, so the `downloads`
-namespace cannot mount this exact PVC. Options, best first:
+## One-time host prep
 
-1. **RWX storage (recommended):** back the library with NFS (or Longhorn RWX)
-   and reference the same share from both `media` and `downloads`.
-2. **Single namespace:** move qBittorrent into the `media` namespace and mount
-   `media-library` directly.
-3. **Separate volumes + move step:** let qBittorrent download into its own PVC
-   and periodically move/hardlink into the library (e.g. via *arr apps).
+```sh
+sudo mkdir -p /mnt/hdd/data/torrents /mnt/hdd/data/media/movies /mnt/hdd/data/media/tv
+# migrate existing downloads into the tree (instant: same filesystem)
+sudo mv /mnt/hdd/Downloads /mnt/hdd/data/torrents/legacy
+# make everything owned by the shared UID/GID
+sudo chown -R 1000:1000 /mnt/hdd/data
+```
 
-## Hardware transcoding
+## Wiring (in the WebUIs, after deploy)
 
-Only enable on nodes with a suitable GPU/VAAPI (i.e. the PC, not the Pi). Mount
-`/dev/dri` and add the `render`/`video` supplemental groups via the pc-k8s
-overlay.
+1. **qBittorrent**: default save path `/data/torrents`; make categories `tv` and
+   `movies` (save to `/data/torrents/tv` and `/data/torrents/movies`). Grab the
+   WebUI temp password from logs: `kubectl -n media logs deploy/qbittorrent | grep -i password`.
+2. **Prowlarr**: add indexers; add Sonarr + Radarr as apps (sync indexers).
+3. **Sonarr**: root folder `/data/media/tv`; add qBittorrent as download client
+   (host `qbittorrent`, port `8080`), category `tv`. Enable "Use Hardlinks".
+4. **Radarr**: root folder `/data/media/movies`; download client `qbittorrent:8080`,
+   category `movies`. Enable "Use Hardlinks".
+5. **Jellyfin**: add libraries pointing at `/media/movies` and `/media/tv`.
+6. **Import legacy**: in Radarr/Sonarr use *Library Import* / *Manual Import*
+   against `/data/torrents/legacy` — files hardlink into `/data/media/*`.
+
+## Optional: route torrent traffic through a VPN provider (later)
+
+Add a Gluetun sidecar to the qBittorrent controller (CyberGhost via WireGuard),
+force qBittorrent's network through it with a kill-switch, and put the provider
+creds in a `*.sops.yaml` secret. Skipped for now to keep full 1 Gbps throughput.
