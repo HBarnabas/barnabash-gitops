@@ -8,3 +8,4 @@ resources:
   - minecraft
   - ddns
   - immich
+  - immich-backup

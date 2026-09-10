@@ -1,0 +1,78 @@
+---
+# Nightly upload of the Immich photo/video originals to the ARCHIVE bucket.
+# `rclone copy` is additive (never deletes remote objects) and compares by
+# size+modtime read from the bucket LISTING (metadata only) -- it never reads
+# object bytes back, so it incurs NO Archive retrieval fees. Regenerable
+# derivatives (thumbs, encoded-video) and the DB dumps (handled by the other
+# job) are excluded.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-backup-photos
+  namespace: immich
+spec:
+  schedule: "0 3 * * *" # 03:00 daily
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 21600 # 6h ceiling for the first (full) upload
+      template:
+        spec:
+          restartPolicy: OnFailure
+          # Runs as root (default for the rclone image) so it can read whatever
+          # UID Immich wrote the library as; the library is mounted read-only so
+          # there is no write risk.
+          containers:
+            - name: rclone
+              image: rclone/rclone:1.75 # multi-arch (arm64 ok on the Pi)
+              args:
+                - copy
+                - /data
+                - gcs:immich-bak-arch/immich
+                - --exclude=thumbs/**
+                - --exclude=encoded-video/**
+                - --exclude=backups/**
+                - --transfers=4
+                - --checkers=8
+                - --fast-list
+                - --stats=1m
+                - --stats-one-line
+                - -v
+              env:
+                - name: RCLONE_CONFIG
+                  value: /config/rclone.conf
+                - name: HOME
+                  value: /tmp
+              volumeMounts:
+                - name: rclone-config
+                  mountPath: /config
+                  readOnly: true
+                - name: gcp-key
+                  mountPath: /var/secrets/gcp
+                  readOnly: true
+                - name: library
+                  mountPath: /data
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 256Mi
+          volumes:
+            - name: rclone-config
+              configMap:
+                name: immich-backup-rclone
+            - name: gcp-key
+              secret:
+                secretName: immich-bak-gcp-key
+            - name: library
+              persistentVolumeClaim:
+                claimName: immich-library
+            - name: tmp
+              emptyDir: {}

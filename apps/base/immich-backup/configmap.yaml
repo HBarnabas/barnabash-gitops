@@ -1,0 +1,19 @@
+---
+# rclone configuration for the GCS backups. One remote is enough: each CronJob
+# targets a different bucket, and new objects inherit the bucket's DEFAULT
+# storage class (ARCHIVE for photos, NEARLINE for DB dumps) automatically -- so
+# we don't set storage_class here.
+#
+# Uses the mounted service-account key. bucket_policy_only=true works with
+# Uniform Bucket-Level Access (the recommended, ACL-free bucket setting).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-backup-rclone
+  namespace: immich
+data:
+  rclone.conf: |
+    [gcs]
+    type = google cloud storage
+    service_account_file = /var/secrets/gcp/key.json
+    bucket_policy_only = true

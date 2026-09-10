@@ -1,0 +1,70 @@
+---
+# Daily upload of Immich's Postgres dumps to the NEARLINE bucket. Immich writes
+# a pg_dump into <library>/backups at 02:00; this runs at 02:30 to catch it.
+# Dump filenames are unique per run, so `copy` just adds each new dump; the
+# bucket's 31-day lifecycle rule ages old ones out (no early-deletion penalty
+# since Nearline's minimum is 30 days). Net: ~30 days of DB history in the
+# cloud vs Immich's 14 local dumps.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: immich-backup-db
+  namespace: immich
+spec:
+  schedule: "30 2 * * *" # 02:30 daily, after Immich's 02:00 DB dump
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: rclone
+              image: rclone/rclone:1.75 # multi-arch (arm64 ok on the Pi)
+              args:
+                - copy
+                - /data/backups
+                - gcs:immich-db-bak-near/immich-db
+                - --transfers=2
+                - --fast-list
+                - --stats-one-line
+                - -v
+              env:
+                - name: RCLONE_CONFIG
+                  value: /config/rclone.conf
+                - name: HOME
+                  value: /tmp
+              volumeMounts:
+                - name: rclone-config
+                  mountPath: /config
+                  readOnly: true
+                - name: gcp-key
+                  mountPath: /var/secrets/gcp
+                  readOnly: true
+                - name: library
+                  mountPath: /data
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 64Mi
+                limits:
+                  memory: 128Mi
+          volumes:
+            - name: rclone-config
+              configMap:
+                name: immich-backup-rclone
+            - name: gcp-key
+              secret:
+                secretName: immich-bak-gcp-key
+            - name: library
+              persistentVolumeClaim:
+                claimName: immich-library
+            - name: tmp
+              emptyDir: {}
