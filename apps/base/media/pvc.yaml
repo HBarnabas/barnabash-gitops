@@ -67,6 +67,19 @@ spec:
     requests:
       storage: 1Gi
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyseerr-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
 # ---------------------------------------------------------------------------
 # Shared data volume on the 2TB HDD. ONE hostPath (/mnt/hdd/data) holding both
 # torrents/ and media/, mounted at /data into qBittorrent + Sonarr + Radarr so
