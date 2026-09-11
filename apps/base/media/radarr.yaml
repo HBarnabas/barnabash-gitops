@@ -43,6 +43,17 @@ spec:
           http:
             port: 7878
             nodePort: 30787
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: radarr.home.barnabash.com
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
     persistence:
       config:
         existingClaim: radarr-config

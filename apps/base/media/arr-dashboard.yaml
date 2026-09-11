@@ -52,6 +52,17 @@ spec:
           http:
             port: 3000
             nodePort: 30030
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: dashboard.home.barnabash.com
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
     persistence:
       config:
         existingClaim: arr-dashboard-config

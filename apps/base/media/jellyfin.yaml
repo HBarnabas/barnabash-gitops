@@ -30,9 +30,16 @@ spec:
       port: 8096
       nodePort: 30096
 
-    # Private only — no public ingress. Access via the VPN.
+    # Reachable by hostname via Traefik (k3s built-in) over LAN/VPN, and still
+    # on the NodePort as a fallback.
     ingress:
-      enabled: false
+      enabled: true
+      className: traefik
+      hosts:
+        - host: jellyfin.home.barnabash.com
+          paths:
+            - path: /
+              pathType: Prefix
 
     persistence:
       config:

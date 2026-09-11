@@ -48,6 +48,17 @@ spec:
           http:
             port: 5055
             nodePort: 30055
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: jellyseerr.home.barnabash.com
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
     persistence:
       config:
         existingClaim: jellyseerr-config

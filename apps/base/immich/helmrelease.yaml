@@ -55,10 +55,19 @@ spec:
             http:
               port: 2283
               nodePort: 30283
-      # Local access only for now — no ingress. Reach it via <node-ip>:30283.
+      # Reachable by hostname via Traefik (k3s built-in) over LAN/VPN, plus the
+      # NodePort fallback above.
       ingress:
         main:
-          enabled: false
+          enabled: true
+          className: traefik
+          annotations: {}
+          hosts:
+            - host: immich.home.barnabash.com
+              paths:
+                - path: "/"
+                  service:
+                    identifier: main
 
     # Off for now (heavy on a Pi). Enable later once the basics work.
     machine-learning:

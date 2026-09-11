@@ -43,6 +43,17 @@ spec:
           http:
             port: 8989
             nodePort: 30989
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: sonarr.home.barnabash.com
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
     persistence:
       config:
         existingClaim: sonarr-config

@@ -43,6 +43,17 @@ spec:
           http:
             port: 9696
             nodePort: 30696
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: prowlarr.home.barnabash.com
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
     persistence:
       config:
         existingClaim: prowlarr-config
