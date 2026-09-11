@@ -11,4 +11,5 @@ resources:
   - radarr.yaml
   - byparr.yaml
   - jellyseerr.yaml
+  - arr-dashboard.yaml
   - jellyfin.yaml

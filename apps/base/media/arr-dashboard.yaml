@@ -1,0 +1,59 @@
+---
+# arr-dashboard — unified control panel across all *arr instances (Sonarr,
+# Radarr, Prowlarr, Lidarr, Readarr) plus Jellyfin/Emby, Plex/Tautulli and
+# Seerr. Aggregates queues, calendar, history, stats and global search.
+#
+# Manages its own auth (password/OIDC/passkeys) and auto-generates its
+# encryption keys on first run, so no SOPS secret is needed here. All the
+# *arr API keys you enter are stored AES-256-GCM encrypted in its /config db.
+# Private, VPN-only.
+#
+# arm64 supported. Pinned to a semver tag (upstream also ships rolling latest).
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arr-dashboard
+  namespace: media
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: "5.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: docker.io/khak1s/arr-dashboard
+              tag: "2.24.1"
+            # Uses the s6/PUID model (starts as root, drops to PUID:PGID).
+            # That's why we don't force a runAsUser securityContext here.
+            env:
+              PUID: "1000"
+              PGID: "1000"
+              TZ: Europe/Budapest
+            resources:
+              requests:
+                cpu: 50m
+                memory: 192Mi
+              limits:
+                memory: 512Mi
+    service:
+      main:
+        controller: main
+        type: NodePort
+        ports:
+          http:
+            port: 3000
+            nodePort: 30030
+    persistence:
+      config:
+        existingClaim: arr-dashboard-config
+        globalMounts:
+          - path: /config
