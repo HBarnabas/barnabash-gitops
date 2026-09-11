@@ -1,7 +1,13 @@
 ---
 # Byparr — Cloudflare-challenge solver (FlareSolverr-compatible drop-in).
 # Prowlarr calls it in-cluster to fetch pages from indexers behind Cloudflare.
-# Stateless (headless browser), no persistent config. Private, ClusterIP only.
+# Stateless (a Firefox/camoufox stealth browser driven by Playwright), no
+# persistent config. Private, ClusterIP only.
+#
+# Single uvicorn worker + single browser. A solve is CPU-heavy (can peg all
+# cores) so we cap CPU to keep the node responsive, and give it a real /dev/shm
+# (k8s defaults to 64Mi, which makes camoufox thrash). BLOCK_MEDIA skips
+# images/css/fonts for a big speed/RAM win.
 #
 # Upstream only publishes rolling tags (latest/main/nightly), no semver.
 # Current 'latest' multi-arch digest (2026-09-10):
@@ -31,15 +37,27 @@ spec:
               tag: latest
             env:
               LOG_LEVEL: INFO
-              # Recycle the browser periodically to keep memory in check.
-              BROWSER_LIMIT: "5"
+              # Don't fetch images/css/fonts while solving — much lower CPU/RAM.
+              BLOCK_MEDIA: "true"
             resources:
               requests:
-                cpu: 100m
+                cpu: 250m
                 memory: 512Mi
               limits:
-                # Headless Chromium is memory-hungry.
-                memory: 1536Mi
+                # Cap CPU so a solve can't peg every core and freeze the node
+                # (Pi 5 has 4 cores; leave one for k3s/system/SSH).
+                cpu: "3"
+                # A single Firefox/camoufox instance plus /dev/shm.
+                memory: 2Gi
+    persistence:
+      # Proper shared memory for the browser (k8s default /dev/shm is 64Mi).
+      # medium: Memory means this counts against the container memory limit.
+      shm:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 256Mi
+        globalMounts:
+          - path: /dev/shm
     service:
       main:
         controller: main
