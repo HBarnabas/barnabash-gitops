@@ -39,8 +39,8 @@ spec:
     #   - cname=media.home.barnabash,jelly.home.barnabash
 
     # Optional: upstream DNS
-    # DNS1: 1.1.1.1
-    # DNS2: 1.0.0.1
+    DNS1: 8.8.8.8
+    DNS2: 8.8.4.4
 
     # Optional: disable Pi-hole DHCP (since your router handles it)
     DHCP_ACTIVE: "false"
