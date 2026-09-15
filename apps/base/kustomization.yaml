@@ -9,3 +9,4 @@ resources:
   - immich
   - immich-backup
   - wireguard
+  - pi-hole

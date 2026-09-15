@@ -1,0 +1,46 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: pihole
+  namespace: networking
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: pihole
+      version: 2.19.0
+      sourceRef:
+        kind: HelmRepository
+        name: mojo2600
+        namespace: flux-system
+
+  values:
+    serviceDns:
+      type: LoadBalancer
+      port: 53
+
+    serviceWeb:
+      type: LoadBalancer
+      port: 80
+
+    # Your custom dnsmasq entries (A records)
+    customDnsEntries:
+      - address=/jellyfin.home.barnabash.com/192.168.0.77
+      - address=/jellyseerr.home.barnabash.com/192.168.0.77
+      - address=/dashboard.home.barnabash.com/192.168.0.77
+      - address=/torrent.home.barnabash.com/192.168.0.77
+      - address=/prowlarr.home.barnabash.com/192.168.0.77
+      - address=/sonarr.home.barnabash.com/192.168.0.77
+      - address=/radarr.home.barnabash.com/192.168.0.77
+      - address=/immich.home.barnabash.com/192.168.0.77
+
+    # # Optional: CNAME rewrites
+    # customCnameEntries:
+    #   - cname=media.home.barnabash,jelly.home.barnabash
+
+    # Optional: upstream DNS
+    # DNS1: 1.1.1.1
+    # DNS2: 1.0.0.1
+
+    # Optional: disable Pi-hole DHCP (since your router handles it)
+    DHCP_ACTIVE: "false"
