@@ -24,15 +24,16 @@ spec:
       port: 80
 
     # Your custom dnsmasq entries (A records)
-    customDnsEntries:
-      - address=/jellyfin.home.barnabash.com/192.168.0.77
-      - address=/jellyseerr.home.barnabash.com/192.168.0.77
-      - address=/dashboard.home.barnabash.com/192.168.0.77
-      - address=/torrent.home.barnabash.com/192.168.0.77
-      - address=/prowlarr.home.barnabash.com/192.168.0.77
-      - address=/sonarr.home.barnabash.com/192.168.0.77
-      - address=/radarr.home.barnabash.com/192.168.0.77
-      - address=/immich.home.barnabash.com/192.168.0.77
+    dnsmasq:
+      customDnsEntries:
+        - address=/jellyfin.home.barnabash.com/192.168.0.77
+        - address=/jellyseerr.home.barnabash.com/192.168.0.77
+        - address=/dashboard.home.barnabash.com/192.168.0.77
+        - address=/torrent.home.barnabash.com/192.168.0.77
+        - address=/prowlarr.home.barnabash.com/192.168.0.77
+        - address=/sonarr.home.barnabash.com/192.168.0.77
+        - address=/radarr.home.barnabash.com/192.168.0.77
+        - address=/immich.home.barnabash.com/192.168.0.77
 
     # # Optional: CNAME rewrites
     # customCnameEntries:
