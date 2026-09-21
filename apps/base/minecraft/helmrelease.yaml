@@ -19,7 +19,7 @@ spec:
     minecraftServer:
       eula: "TRUE"
       type: PAPER # PAPER = good performance + plugins; use VANILLA/FABRIC/FORGE as needed
-      version: 26.3
+      version: "26.3"
       difficulty: normal
       # Expose so friends can connect. LoadBalancer gets a dedicated IP
       # (k3s servicelb / MetalLB). Switch to NodePort if you prefer.
