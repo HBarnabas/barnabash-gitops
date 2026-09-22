@@ -24,8 +24,11 @@ spec:
         type: NodePort
       ingress:
         enabled: true
+        ingressClassName: traefik
         hosts:
-          - "grafana.home.barnabash.com"
+          - grafana.home.barnabash.com
+        paths:
+          - /
 
     prometheus:
       prometheusSpec:
