@@ -34,6 +34,7 @@ spec:
         - address=/sonarr.home.barnabash.com/192.168.0.77
         - address=/radarr.home.barnabash.com/192.168.0.77
         - address=/immich.home.barnabash.com/192.168.0.77
+        - address=/grafana.home.barnabash.com/192.168.0.77
 
     # # Optional: CNAME rewrites
     # customCnameEntries:
