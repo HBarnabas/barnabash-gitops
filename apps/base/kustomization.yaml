@@ -10,4 +10,4 @@ resources:
   - immich-backup
   - wireguard
   - pi-hole
-  - monitoring
+  # - monitoring
