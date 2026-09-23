@@ -36,6 +36,14 @@ spec:
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         ruleSelectorNilUsesHelmValues: false
+        scrapeInterval: "60s"
+        nodeExporter:
+          enabled: true
+          extraArgs:
+            - '--collector.systemd=false'
+            - '--collector.processes=false'
+            - '--collector.tcpstat=false'
+            - '--collector.interrupts=false'
 
     alertmanager:
       enabled: true
