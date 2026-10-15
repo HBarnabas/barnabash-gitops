@@ -31,7 +31,10 @@ spec:
       # Ops / whitelist — put your and friends' usernames/UUIDs here.
       ops: ""
       whitelist: "LightsOut_101,HerrLinks,Joko11222,Barnovskij"
-      item-despawn-rate: 36000
+      spigotYaml:
+        world-settings:
+          default:
+            item-despawn-rate: 36000
       overrideServerProperties: true
       memory: 2G # bump on pc-k8s via overlay patch
     resources:
