@@ -32,7 +32,7 @@ spec:
       ops: ""
       whitelist: "LightsOut_101,HerrLinks,Joko11222,Barnovskij"
       pluginUrls:
-        - "https://modrinth.com/plugin/custom-time/version/1.0.1"
+        - "https://cdn.modrinth.com/data/iyXdvueB/versions/rlR4hXpl/customtime-1.0.1.jar"
       overrideServerProperties: true
       memory: 2G # bump on pc-k8s via overlay patch
     resources:
