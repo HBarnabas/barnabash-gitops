@@ -33,6 +33,9 @@ spec:
       whitelist: "LightsOut_101,HerrLinks,Joko11222,Barnovskij"
       pluginUrls:
         - "https://cdn.modrinth.com/data/iyXdvueB/versions/rlR4hXpl/customtime-1.0.1.jar" # set day/night to 45/20mins in /data/plugins/CustomTime/config.yml
+        - "https://cdn.modrinth.com/data/lO4tsixF/versions/2EkFsXm1/DeathChest-1.1.1.jar"
+        - "https://cdn.modrinth.com/data/UpDZRvru/versions/9Kn5c13O/TabLocation-2.0.jar"
+        - "https://hangarcdn.papermc.io/plugins/ayberkconff/SleepVote/versions/1.0/PAPER/SleepVote-1.0-SNAPSHOT.jar"
       overrideServerProperties: true
       memory: 2G # bump on pc-k8s via overlay patch
     resources:
