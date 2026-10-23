@@ -34,7 +34,7 @@ spec:
       pluginUrls:
         - "https://cdn.modrinth.com/data/iyXdvueB/versions/rlR4hXpl/customtime-1.0.1.jar" # set day/night to 45/20mins in /data/plugins/CustomTime/config.yml
         #- "https://cdn.modrinth.com/data/lO4tsixF/versions/2EkFsXm1/DeathChest-1.1.1.jar"
-        - "https://www.dropbox.com/scl/fi/1kjjc0q7ni18bbmuj1mp2/GraveBox-2.1.jar"
+        - "https://hangarcdn.papermc.io/plugins/stargaze/Vitamin/versions/1.4.4/PAPER/Vitamin-1.4.4.jar"
         - "https://cdn.modrinth.com/data/UpDZRvru/versions/9Kn5c13O/TabLocation-2.0.jar"
         - "https://hangarcdn.papermc.io/plugins/ayberkconff/SleepVote/versions/1.0/PAPER/SleepVote-1.0-SNAPSHOT.jar"
         - "https://hangarcdn.papermc.io/plugins/cosmo-jar/LovelyTimeFlow/versions/1.0/PAPER/Lovely%20Time%20Flow-1.0.jar"
