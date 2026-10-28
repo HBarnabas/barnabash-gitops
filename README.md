@@ -5,12 +5,11 @@ GitOps source of truth for my home server, reconciled by [Flux](https://fluxcd.i
 It is designed to run on **either** target with the same baseline:
 
 - `rpi5-k3s` — Raspberry Pi 5 running k3s + Flux (uses k3s built-in servicelb + local-path).
-- `pc-k8s` — full Kubernetes on PC hardware (adds MetalLB + a storage provisioner).
+- `pc-k3s` — PC hardware running k3s + Flux, with larger storage and resource requests.
 
 Only one cluster is bootstrapped at a time; the other directory just sits idle
 until/if you build it. Everything shared lives in `*/base`, and each cluster
-overlay changes only what genuinely differs (load balancer, storage sizes,
-resource limits).
+overlay changes only what genuinely differs (storage sizes and resource limits).
 
 ## Repository layout
 
@@ -23,15 +22,15 @@ clusters/<cluster>/           # Flux entrypoints (bootstrap writes flux-system/)
 infrastructure/
   ├─ controllers/base         # cert-manager, ingress-nginx, reloader, Helm sources
   ├─ controllers/rpi5-k3s     # inherits base (k3s built-ins cover LB + storage)
-  ├─ controllers/pc-k8s       # base + MetalLB (+ storage notes)
+  ├─ controllers/pc-k3s       # inherits base; k3s provides LB + local-path
   ├─ configs/base             # Let's Encrypt ClusterIssuers
   ├─ configs/rpi5-k3s         # inherits base
-  └─ configs/pc-k8s           # base + MetalLB IP pool
+  └─ configs/pc-k3s           # inherits base
 
 apps/
   ├─ base/{immich,media,downloads,minecraft}
   ├─ rpi5-k3s                 # base + Pi-sized patches
-  └─ pc-k8s                   # base + bigger storage/resources
+  └─ pc-k3s                   # base + bigger storage/resources
 ```
 
 Reconcile order per cluster: `infra-controllers` → `infra-configs` → `apps`
@@ -55,12 +54,12 @@ Install locally: `flux`, `kubectl`, `kustomize`, `sops`, `age`.
 
 ## Bootstrap
 
-1. Create a cluster (k3s on the Pi, or kubeadm/etc. on the PC) and point
+1. Create a k3s cluster on the target machine and point
    `KUBECONFIG` at it.
 2. **Before first bootstrap**, review the TODOs:
    - `.sops.yaml` — put your age **public** key.
    - `infrastructure/configs/base/cluster-issuers.yaml` — your email.
-   - `infrastructure/configs/pc-k8s/metallb-pool.yaml` — your LAN IP range (PC only).
+    - Mount the PC data disk at `/mnt/hdd` before workloads start, or update the shared PV host paths.
    - Each app's domain (`*.example.com`) and secrets.
 3. Bootstrap the cluster you're building, e.g. the Pi:
 
@@ -73,7 +72,7 @@ Install locally: `flux`, `kubectl`, `kustomize`, `sops`, `age`.
      --personal
    ```
 
-   (For the PC use `--path=clusters/pc-k8s`.)
+  (For the PC use `--path=clusters/pc-k3s`.)
 4. Create the SOPS decryption key in-cluster so Flux can decrypt secrets:
 
    ```sh
@@ -101,9 +100,9 @@ No cluster needed to catch structural errors:
 
 ```sh
 kustomize build apps/rpi5-k3s
-kustomize build apps/pc-k8s
-kustomize build infrastructure/controllers/pc-k8s
-kustomize build infrastructure/configs/pc-k8s
+kustomize build apps/pc-k3s
+kustomize build infrastructure/controllers/pc-k3s
+kustomize build infrastructure/configs/pc-k3s
 ```
 
 ## Version pinning

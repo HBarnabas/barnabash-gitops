@@ -6,11 +6,11 @@
 #     --owner=<your-github-user> \
 #     --repository=barnabash-gitops \
 #     --branch=main \
-#     --path=clusters/pc-k8s \
+#     --path=clusters/pc-k3s \
 #     --personal
 #
 # Bootstrap writes gotk-components.yaml, gotk-sync.yaml and a kustomization.yaml
 # into this folder and commits them. After that, everything referenced from
-# clusters/pc-k8s (infrastructure.yaml + apps.yaml) is reconciled by Flux.
+# clusters/pc-k3s (infrastructure.yaml + apps.yaml) is reconciled by Flux.
 #
 # Do not hand-edit the generated files; re-run bootstrap to upgrade Flux.

@@ -27,5 +27,5 @@ Bedrock/console players join, then expose UDP 19132.
 
 ## Tuning
 
-The Pi should stay around `memory: 2G`. On pc-k8s the overlay can bump memory
-and CPU for more players / render distance.
+The Pi should stay around `memory: 2G`. The `pc-k3s` overlay bumps memory
+for more players / render distance.

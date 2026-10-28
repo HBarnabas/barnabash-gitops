@@ -1,5 +1,5 @@
 ---
-# Infrastructure controllers: cert-manager, ingress-nginx, reloader, metallb, ...
+# Infrastructure controllers: cert-manager, ingress-nginx, reloader, ...
 # These are the low-level pieces everything else depends on.
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -13,7 +13,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./infrastructure/controllers/pc-k8s
+  path: ./infrastructure/controllers/pc-k3s
   prune: true
   wait: true
   decryption:
@@ -21,7 +21,7 @@ spec:
     secretRef:
       name: sops-age
 ---
-# Cluster-scoped configuration (ClusterIssuers, MetalLB pools, ...).
+# Cluster-scoped configuration (ClusterIssuers, storage classes, ...).
 # Depends on the controllers being installed and healthy first.
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -37,7 +37,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./infrastructure/configs/pc-k8s
+  path: ./infrastructure/configs/pc-k3s
   prune: true
   decryption:
     provider: sops

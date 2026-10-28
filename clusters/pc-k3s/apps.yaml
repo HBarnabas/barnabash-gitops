@@ -15,7 +15,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps/pc-k8s
+  path: ./apps/pc-k3s
   prune: true
   wait: true
   decryption:

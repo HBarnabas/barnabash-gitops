@@ -39,7 +39,7 @@ spec:
         - "https://cdn.modrinth.com/data/AT4q5h3l/versions/TcxQEjO6/confluxmap-paper-0.1.13.jar"
         - "https://hangarcdn.papermc.io/plugins/cosmo-jar/LovelyTimeFlow/versions/1.0/PAPER/Lovely%20Time%20Flow-1.0.jar"
       overrideServerProperties: true
-      memory: 2G # bump on pc-k8s via overlay patch
+      memory: 2G # bump on pc-k3s via overlay patch
     resources:
       requests:
         cpu: 500m

@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# PC hardware running k3s has more CPU/RAM available, so scale up Minecraft.
+resources:
+  - ../base
+patches:
+  # More headroom for the Minecraft server.
+  - target:
+      kind: HelmRelease
+      name: minecraft
+      namespace: minecraft
+    patch: |
+      - op: replace
+        path: /spec/values/minecraftServer/memory
+        value: "6G"
+      - op: replace
+        path: /spec/values/resources/requests/memory
+        value: "7Gi"

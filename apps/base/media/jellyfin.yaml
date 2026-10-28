@@ -57,4 +57,4 @@ spec:
       limits:
         memory: 1Gi
     # Hardware transcoding (VAAPI/QSV) needs /dev/dri + render group -- only on a
-    # GPU-capable node. Leave off on the Pi; enable via a pc-k8s overlay later.
+    # GPU-capable node. Leave off on the Pi; enable via a pc-k3s overlay later.

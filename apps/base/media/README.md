@@ -1,15 +1,15 @@
 # Media stack (private, VPN-only)
 
 A hardlink-friendly \*arr + Jellyfin stack, all in the `media` namespace on the
-single Pi node. Reach each WebUI over the WireGuard tunnel (NodePorts):
+single k3s node. Reach each WebUI over the WireGuard tunnel (NodePorts):
 
 | App         | URL over VPN                | NodePort |
 |-------------|-----------------------------|----------|
-| Jellyfin    | http://<pi-ip>:30096        | 30096    |
-| qBittorrent | http://<pi-ip>:30080        | 30080    |
-| Prowlarr    | http://<pi-ip>:30696        | 30696    |
-| Sonarr      | http://<pi-ip>:30989        | 30989    |
-| Radarr      | http://<pi-ip>:30787        | 30787    |
+| Jellyfin    | http://<node-ip>:30096      | 30096    |
+| qBittorrent | http://<node-ip>:30080      | 30080    |
+| Prowlarr    | http://<node-ip>:30696      | 30696    |
+| Sonarr      | http://<node-ip>:30989      | 30989    |
+| Radarr      | http://<node-ip>:30787      | 30787    |
 
 ## Storage layout (single filesystem = instant hardlinks)
 
@@ -29,6 +29,9 @@ single Pi node. Reach each WebUI over the WireGuard tunnel (NodePorts):
 - All apps run as UID/GID **1000** so ownership is consistent.
 
 ## One-time host prep
+
+Mount the data disk at `/mnt/hdd` on the node before starting workloads, then
+create the directories and set ownership:
 
 ```sh
 sudo mkdir -p /mnt/hdd/data/torrents /mnt/hdd/data/media/movies /mnt/hdd/data/media/tv
