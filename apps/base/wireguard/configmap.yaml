@@ -23,10 +23,9 @@ data:
   # "0.0.0.0/0, ::/0".
   WG_ALLOWED_IPS: "192.168.0.0/24"
 
-  # DNS handed to clients. Pointing at your router lets you use LAN hostnames
-  # over the tunnel; accessing services by IP (e.g. Immich at 192.168.0.77)
-  # works regardless. It's in the AllowedIPs range, so queries route correctly.
-  WG_DEFAULT_DNS: "192.168.0.1"
+  # DNS handed to clients: Pi-hole, so the *.home.barnabash.com names resolve
+  # over the tunnel. It's in the AllowedIPs range, so queries route correctly.
+  WG_DEFAULT_DNS: "192.168.0.247"
 
   # Internal VPN subnet for peers (server is .1). Default is fine.
   WG_DEFAULT_ADDRESS: "10.8.0.x"

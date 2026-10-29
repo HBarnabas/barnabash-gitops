@@ -48,9 +48,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/wireguard
-            - name: modules
-              mountPath: /lib/modules
-              readOnly: true
           resources:
             requests:
               cpu: 25m
@@ -61,9 +58,3 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: wireguard-config
-        # Host kernel modules, so wg-easy can load the wireguard module if it
-        # isn't already built in/loaded on the node.
-        - name: modules
-          hostPath:
-            path: /lib/modules
-            type: Directory
