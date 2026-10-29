@@ -26,6 +26,7 @@ spec:
     # Your custom dnsmasq entries (A records)
     dnsmasq:
       customDnsEntries:
+        - address=/vpn.barnabash.com/192.168.0.247
         - address=/jellyfin.home.barnabash.com/192.168.0.247
         - address=/jellyseerr.home.barnabash.com/192.168.0.247
         - address=/dashboard.home.barnabash.com/192.168.0.247

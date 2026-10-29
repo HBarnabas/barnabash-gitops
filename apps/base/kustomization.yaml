@@ -8,6 +8,8 @@ resources:
   - ddns
   - immich
   - immich-backup
+  - headscale
+  # Retain the old WireGuard config and PVC for rollback; its Deployment is retired.
   - wireguard
   - pi-hole
   # - monitoring

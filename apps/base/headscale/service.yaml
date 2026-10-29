@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: headscale
+  namespace: headscale
+spec:
+  type: ClusterIP
+  selector:
+    app: headscale
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: headscale-stun
+  namespace: headscale
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: headscale
+  ports:
+    - name: stun
+      port: 3478
+      targetPort: stun
+      protocol: UDP
