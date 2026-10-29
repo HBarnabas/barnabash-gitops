@@ -48,6 +48,9 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/wireguard
+            - name: modules
+              mountPath: /lib/modules
+              readOnly: true
           resources:
             requests:
               cpu: 25m
@@ -58,3 +61,8 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: wireguard-config
+        # NixOS keeps the active kernel modules outside /lib/modules.
+        - name: modules
+          hostPath:
+            path: /run/current-system/kernel-modules/lib/modules
+            type: Directory
