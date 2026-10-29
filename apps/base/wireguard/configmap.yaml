@@ -33,8 +33,8 @@ data:
   # Keepalive helps NAT traversal so the tunnel stays reachable behind CGNAT/NAT.
   WG_PERSISTENT_KEEPALIVE: "25"
 
-  # The Pi's LAN network interface. wg-easy masquerades VPN client traffic OUT
+  # The server's LAN network interface. wg-easy masquerades VPN client traffic OUT
   # this interface to reach your LAN (192.168.0.0/24), so it MUST match your
   # actual wired interface. Verify on the Pi with:  ip route show default
-  # (look at 'dev <iface>'). Common on RPi5/Ubuntu: eth0 or end0.
-  WG_DEVICE: "eth0" # TODO: confirm with `ip route show default`
+  # (look at 'dev <iface>').
+  WG_DEVICE: "enp6s0"
