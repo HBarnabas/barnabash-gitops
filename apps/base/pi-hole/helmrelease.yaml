@@ -26,15 +26,15 @@ spec:
     # Your custom dnsmasq entries (A records)
     dnsmasq:
       customDnsEntries:
-        - address=/jellyfin.home.barnabash.com/192.168.0.77
-        - address=/jellyseerr.home.barnabash.com/192.168.0.77
-        - address=/dashboard.home.barnabash.com/192.168.0.77
-        - address=/torrent.home.barnabash.com/192.168.0.77
-        - address=/prowlarr.home.barnabash.com/192.168.0.77
-        - address=/sonarr.home.barnabash.com/192.168.0.77
-        - address=/radarr.home.barnabash.com/192.168.0.77
-        - address=/immich.home.barnabash.com/192.168.0.77
-        - address=/grafana.home.barnabash.com/192.168.0.77
+        - address=/jellyfin.home.barnabash.com/192.168.0.247
+        - address=/jellyseerr.home.barnabash.com/192.168.0.247
+        - address=/dashboard.home.barnabash.com/192.168.0.247
+        - address=/torrent.home.barnabash.com/192.168.0.247
+        - address=/prowlarr.home.barnabash.com/192.168.0.247
+        - address=/sonarr.home.barnabash.com/192.168.0.247
+        - address=/radarr.home.barnabash.com/192.168.0.247
+        - address=/immich.home.barnabash.com/192.168.0.247
+        - address=/grafana.home.barnabash.com/192.168.0.247
 
     # # Optional: CNAME rewrites
     # customCnameEntries:
