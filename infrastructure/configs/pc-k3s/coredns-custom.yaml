@@ -4,8 +4,12 @@ metadata:
   name: coredns-custom
   namespace: kube-system
 data:
-  headscale.override: |
-    hosts {
-      192.168.0.247 vpn.barnabash.com
-      fallthrough
+  headscale.server: |
+    vpn.barnabash.com:53 {
+      errors
+      hosts {
+        192.168.0.247 vpn.barnabash.com
+        fallthrough
+      }
+      forward . /etc/resolv.conf
     }
