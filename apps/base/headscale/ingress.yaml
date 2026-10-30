@@ -4,9 +4,9 @@ metadata:
   name: headscale
   namespace: headscale
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-traefik
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   tls:
     - hosts:
         - vpn.barnabash.com

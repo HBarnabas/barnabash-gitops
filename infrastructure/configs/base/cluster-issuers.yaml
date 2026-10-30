@@ -36,3 +36,20 @@ spec:
       - http01:
           ingress:
             class: nginx
+---
+# The k3s-bundled Traefik ingress serves the application hostnames. Use its
+# class for HTTP-01 challenges requested by those ingresses.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-traefik
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: hbarnabas@outlook.com
+    privateKeySecretRef:
+      name: letsencrypt-traefik-account-key
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: traefik
