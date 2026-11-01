@@ -31,6 +31,7 @@ spec:
       customDnsEntries:
         - address=/vpn.barnabash.com/192.168.0.247
         - address=/calibre.home.barnabash.com/192.168.0.247
+        - address=/lazylibrarian.home.barnabash.com/192.168.0.247
         - address=/jellyfin.home.barnabash.com/192.168.0.247
         - address=/jellyseerr.home.barnabash.com/192.168.0.247
         - address=/dashboard.home.barnabash.com/192.168.0.247

@@ -4,20 +4,21 @@ A hardlink-friendly \*arr + Jellyfin + ebook stack, all in the `media`
 namespace on the single k3s node. Reach the WebUIs over the Headscale mesh or
 LAN:
 
-| App         | URL over LAN/mesh                           | NodePort |
-|-------------|---------------------------------------------|----------|
-| Jellyfin    | http://<node-ip>:30096                      | 30096    |
-| qBittorrent | http://<node-ip>:30080                      | 30080    |
-| Prowlarr    | http://<node-ip>:30696                      | 30696    |
-| Sonarr      | http://<node-ip>:30989                      | 30989    |
-| Radarr      | http://<node-ip>:30787                      | 30787    |
-| Calibre-Web | http://calibre.home.barnabash.com or :30883 | 30883    |
+| App           | URL over LAN/mesh                                 | NodePort |
+|---------------|---------------------------------------------------|----------|
+| Jellyfin      | http://<node-ip>:30096                            | 30096    |
+| qBittorrent   | http://<node-ip>:30080                            | 30080    |
+| Prowlarr      | http://<node-ip>:30696                            | 30696    |
+| Sonarr        | http://<node-ip>:30989                            | 30989    |
+| Radarr        | http://<node-ip>:30787                            | 30787    |
+| Calibre-Web   | http://calibre.home.barnabash.com or :30883       | 30883    |
+| LazyLibrarian | http://lazylibrarian.home.barnabash.com or :30529 | 30529    |
 
 ## Storage layout (single filesystem = instant hardlinks)
 
 ```
 /mnt/hdd/data/
-  torrents/            qBittorrent save path (categories: tv, movies)
+  torrents/            qBittorrent save path (categories: tv, movies, books)
   media/
     movies/            Radarr root folder  -> Jellyfin library
     tv/                Sonarr root folder  -> Jellyfin library
@@ -30,6 +31,8 @@ LAN:
 - `jellyfin-media` PVC (hostPath `/mnt/hdd/data/media`) is mounted at `/media`
   in Jellyfin only (it never sees `torrents/`).
 - `calibre-library` PVC is mounted at `/books` in Calibre-Web.
+- LazyLibrarian mounts the same library at `/books` and the shared data volume
+  at `/data`; book downloads can stage under `/data/torrents/books`.
 - All apps run as UID/GID **1000** so ownership is consistent.
 
 ## One-time host prep
@@ -38,7 +41,7 @@ Mount the data disk at `/mnt/hdd` on the node before starting workloads, then
 create the directories and set ownership:
 
 ```sh
-sudo mkdir -p /mnt/hdd/data/torrents/{tv,movies,legacy} /mnt/hdd/data/media/{movies,tv,books}
+sudo mkdir -p /mnt/hdd/data/torrents/{tv,movies,books,legacy} /mnt/hdd/data/media/{movies,tv,books}
 # Seed an empty Calibre database only when this is a new library.
 if [ ! -f /mnt/hdd/data/media/books/metadata.db ]; then
   sudo curl -fL https://raw.githubusercontent.com/janeczku/calibre-web/master/library/metadata.db \
@@ -53,8 +56,8 @@ sudo chown -R 1000:1000 /mnt/hdd/data
 ## Wiring (in the WebUIs, after deploy)
 
 1. **qBittorrent**: default save path `/data/torrents`; make categories `tv`,
-   and `movies` (save to `/data/torrents/tv` and `/data/torrents/movies`). Grab
-   the WebUI temp password from logs:
+   `movies`, and `books` (save to their matching subdirectories). Grab the
+   WebUI temp password from logs:
    `kubectl -n media logs deploy/qbittorrent | grep -i password`.
 2. **Prowlarr**: add indexers; add Sonarr and Radarr as apps (sync indexers).
    Byparr is a FlareSolverr-compatible **indexer proxy**, not an indexer:
@@ -72,8 +75,21 @@ sudo chown -R 1000:1000 /mnt/hdd/data
    location to `/books`. Add books manually using Calibre-Web's upload option.
    The OPDS catalog is at `/opds`; an iPad reader can connect to
    `http://<node-ip>:30883/opds`.
-6. **Jellyfin**: add libraries pointing at `/media/movies` and `/media/tv`.
-7. **Import legacy**: in Radarr/Sonarr use *Library Import* / *Manual Import*
+6. **LazyLibrarian**: open `http://lazylibrarian.home.barnabash.com/home` or
+   `http://<node-ip>:30529/home` over LAN/Headscale and enable access control
+   with your own credentials. Set the book library destination to `/books`.
+   Under **Settings → Processing**, set the Calibre import program to
+   `/usr/bin/calibredb` so completed books are added to the shared Calibre
+   database. The image includes the LinuxServer Calibre mod for this command.
+   For a manual test, set the Alternate Import Folder to
+   `/data/torrents/books`, import a test ebook you own, and verify it appears in
+   Calibre-Web before enabling scheduled searches or downloaders. If you later
+   enable downloads, use qBittorrent at `qbittorrent:8080` and stage them in
+   `/data/torrents/books`.
+7. Calibre-Web and LazyLibrarian both update the same Calibre database; avoid
+   uploading books in Calibre-Web while LazyLibrarian is importing.
+8. **Jellyfin**: add libraries pointing at `/media/movies` and `/media/tv`.
+9. **Import legacy**: in Radarr/Sonarr use *Library Import* / *Manual Import*
    against `/data/torrents/legacy` — files hardlink into `/data/media/*`.
 
 ## Jellyfin 12 upgrade
@@ -103,9 +119,7 @@ Seerr reuses the `jellyseerr-config` PVC mounted at `/app/config` and migrates
 the Jellyseerr instance automatically on first startup. Back up that PVC before
 the image upgrade.
 
-Book automation is intentionally deferred. After manual Calibre-Web uploads and
-OPDS access are confirmed, LazyLibrarian can be added as a separate step. Do not
-port-forward these services from the public internet.
+Do not port-forward these services from the public internet.
 
 ## Optional: route torrent traffic through a VPN provider (later)
 

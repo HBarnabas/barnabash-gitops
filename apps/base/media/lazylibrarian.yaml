@@ -1,0 +1,70 @@
+# LazyLibrarian book manager. It shares the Calibre-Web library and media
+# downloads volume; keep the UI private to LAN/Headscale.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: lazylibrarian
+  namespace: media
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: "5.3.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      main:
+        strategy:
+          type: Recreate
+        containers:
+          main:
+            image:
+              repository: lscr.io/linuxserver/lazylibrarian
+              tag: version-dbf29bf2
+            env:
+              PUID: "1000"
+              PGID: "1000"
+              TZ: Europe/Budapest
+              DOCKER_MODS: linuxserver/mods:universal-calibre
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+    service:
+      main:
+        controller: main
+        type: NodePort
+        ports:
+          http:
+            port: 5299
+            nodePort: 30529
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: lazylibrarian.home.barnabash.com
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+    persistence:
+      config:
+        existingClaim: lazylibrarian-config
+        globalMounts:
+          - path: /config
+      data:
+        existingClaim: media-data
+        globalMounts:
+          - path: /data
+      library:
+        existingClaim: calibre-library
+        globalMounts:
+          - path: /books
