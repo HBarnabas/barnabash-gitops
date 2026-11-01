@@ -58,6 +58,10 @@ spec:
         existingClaim: lazylibrarian-config
         globalMounts:
           - path: /config
+      calibre-config:
+        existingClaim: calibre-web-config
+        globalMounts:
+          - path: /calibre-config
       data:
         existingClaim: media-data
         globalMounts:
