@@ -20,13 +20,17 @@ spec:
       port: 53
 
     serviceWeb:
-      type: LoadBalancer
-      port: 80
+      type: NodePort
+      http:
+        nodePort: 30702
+      https:
+        nodePort: 32609
 
     # Your custom dnsmasq entries (A records)
     dnsmasq:
       customDnsEntries:
         - address=/vpn.barnabash.com/192.168.0.247
+        - address=/calibre.home.barnabash.com/192.168.0.247
         - address=/jellyfin.home.barnabash.com/192.168.0.247
         - address=/jellyseerr.home.barnabash.com/192.168.0.247
         - address=/dashboard.home.barnabash.com/192.168.0.247

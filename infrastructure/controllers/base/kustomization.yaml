@@ -5,5 +5,4 @@ resources:
   - namespaces.yaml
   - sources.yaml
   - cert-manager.yaml
-  - ingress-nginx.yaml
   - reloader.yaml

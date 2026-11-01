@@ -1,5 +1,5 @@
 ---
-# Let's Encrypt issuers using the HTTP-01 challenge via the nginx ingress class.
+# Let's Encrypt issuers using the HTTP-01 challenge via the Traefik ingress class.
 # Use the staging issuer while testing (its certs are not browser-trusted but it
 # has generous rate limits), then switch Ingresses to letsencrypt-prod.
 #
@@ -19,7 +19,7 @@ spec:
     solvers:
       - http01:
           ingress:
-            class: nginx
+            ingressClassName: traefik
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -35,7 +35,7 @@ spec:
     solvers:
       - http01:
           ingress:
-            class: nginx
+            ingressClassName: traefik
 ---
 # The k3s-bundled Traefik ingress serves the application hostnames. Use its
 # class for HTTP-01 challenges requested by those ingresses.
