@@ -18,9 +18,6 @@ spec:
         name: jellyfin
         namespace: flux-system
   values:
-    deploymentStrategy:
-      type: Recreate
-
     image:
       repository: lscr.io/linuxserver/jellyfin
       tag: version-12.4ubu2604
