@@ -80,6 +80,19 @@ spec:
     requests:
       storage: 1Gi
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: calibre-web-config
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+---
 # apiVersion: v1
 # kind: PersistentVolumeClaim
 # metadata:
@@ -96,9 +109,9 @@ spec:
 # ---------------------------------------------------------------------------
 # Shared data volume on the 2TB HDD. ONE hostPath (/mnt/hdd/data) holding both
 # torrents/ and media/, mounted at /data into qBittorrent + Sonarr + Radarr so
-# hardlinks and instant atomic moves work (same filesystem). hostPath capacity
-# is informational; it shares the HDD's free space. Retain = data survives
-# PV/PVC recreation. RWO is fine: all pods run on the single node.
+# hardlinks and instant atomic moves work (same filesystem).
+# hostPath capacity is informational; it shares the HDD's free space. Retain =
+# data survives PV/PVC recreation. RWO is fine: all pods run on the single node.
 # ---------------------------------------------------------------------------
 apiVersion: v1
 kind: PersistentVolume
@@ -159,3 +172,33 @@ spec:
   resources:
     requests:
       storage: 1500Gi
+---
+# Calibre-Web's library lives on the HDD with the rest of the media data.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: calibre-library-data
+spec:
+  capacity:
+    storage: 1000Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: hdd
+  hostPath:
+    path: /mnt/hdd/data/media/books
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: calibre-library
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hdd
+  volumeName: calibre-library-data
+  resources:
+    requests:
+      storage: 1000Gi
