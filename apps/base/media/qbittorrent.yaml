@@ -21,19 +21,20 @@ spec:
     # /data are consistent. The host dir /mnt/hdd/data must be chown'd to 1000.
     defaultPodOptions:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
         fsGroup: 1000
     controllers:
       main:
         containers:
           main:
             image:
-              repository: ghcr.io/home-operations/qbittorrent
-              tag: 5.2.3
+              repository: lscr.io/linuxserver/qbittorrent
+              tag: version-5.3.0_v2.1.2
             env:
+              PUID: "1000"
+              PGID: "1000"
+              TZ: Europe/Budapest
               UMASK: "022"
-              QBT_WEBUI_PORT: "8080"
+              WEBUI_PORT: "8080"
             resources:
               requests:
                 cpu: 25m

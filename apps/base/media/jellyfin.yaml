@@ -18,12 +18,22 @@ spec:
         name: jellyfin
         namespace: flux-system
   values:
+    image:
+      repository: lscr.io/linuxserver/jellyfin
+      tag: version-12.4ubu2604
+
     # Same UID/GID family as the *arr apps so it can read the library files.
     podSecurityContext:
       fsGroup: 1000
-    securityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
+
+    jellyfin:
+      env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: Europe/Budapest
 
     service:
       type: NodePort

@@ -1,5 +1,5 @@
 ---
-# Jellyseerr — request manager (Overseerr fork with Jellyfin support). Users
+# Seerr — request manager (formerly Jellyseerr, with Jellyfin support). Users
 # browse and request titles; it hands them to Sonarr/Radarr and reads the
 # Jellyfin library for availability. Config/db only, no media access needed.
 # Private, VPN-only.
@@ -29,8 +29,8 @@ spec:
         containers:
           main:
             image:
-              repository: ghcr.io/fallenbagel/jellyseerr
-              tag: 2.7.3
+              repository: ghcr.io/seerr-team/seerr
+              tag: v3.5.1
             env:
               TZ: Europe/Budapest
               LOG_LEVEL: info

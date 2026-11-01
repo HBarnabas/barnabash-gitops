@@ -19,16 +19,18 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
         fsGroup: 1000
     controllers:
       main:
         containers:
           main:
             image:
-              repository: ghcr.io/home-operations/prowlarr
-              tag: 2.1.5
+              repository: lscr.io/linuxserver/prowlarr
+              tag: version-2.7.0.5723
+            env:
+              PUID: "1000"
+              PGID: "1000"
+              TZ: Europe/Budapest
             resources:
               requests:
                 cpu: 25m

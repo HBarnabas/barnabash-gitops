@@ -19,16 +19,18 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
         fsGroup: 1000
     controllers:
       main:
         containers:
           main:
             image:
-              repository: ghcr.io/home-operations/sonarr
-              tag: 4.0.20
+              repository: lscr.io/linuxserver/sonarr
+              tag: version-4.0.20.3014
+            env:
+              PUID: "1000"
+              PGID: "1000"
+              TZ: Europe/Budapest
             resources:
               requests:
                 cpu: 25m
