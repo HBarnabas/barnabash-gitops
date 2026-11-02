@@ -14,6 +14,9 @@ LAN:
 | Calibre-Web   | http://calibre.home.barnabash.com or :30883       | 30883    |
 | LazyLibrarian | http://lazylibrarian.home.barnabash.com or :30529 | 30529    |
 
+The Calibre content server is internal-only at
+`http://calibre-content-server:8081`; it has no Ingress or NodePort.
+
 ## Storage layout (single filesystem = instant hardlinks)
 
 ```
@@ -30,7 +33,8 @@ LAN:
   and seeding continues from the same bytes.
 - `jellyfin-media` PVC (hostPath `/mnt/hdd/data/media`) is mounted at `/media`
   in Jellyfin only (it never sees `torrents/`).
-- `calibre-library` PVC is mounted at `/books` in Calibre-Web.
+- `calibre-library` PVC is mounted at `/books` in Calibre-Web,
+  LazyLibrarian, and the Calibre content server.
 - LazyLibrarian mounts the same library at `/books` and the shared data volume
   at `/data`; book downloads can stage under `/data/torrents/books`.
 - All apps run as UID/GID **1000** so ownership is consistent.
@@ -75,21 +79,27 @@ sudo chown -R 1000:1000 /mnt/hdd/data
    location to `/books`. Add books manually using Calibre-Web's upload option.
    The OPDS catalog is at `/opds`; an iPad reader can connect to
    `http://<node-ip>:30883/opds`.
-6. **LazyLibrarian**: open `http://lazylibrarian.home.barnabash.com/home` or
+6. **Calibre content server**: it runs internally with authentication and
+   write access. Get the LazyLibrarian service password with
+   `sops -d apps/base/media/calibre-content-server-secret.sops.yaml`; the
+   username is `lazylibrarian`.
+7. **LazyLibrarian**: open `http://lazylibrarian.home.barnabash.com/home` or
    `http://<node-ip>:30529/home` over LAN/Headscale and enable access control
    with your own credentials. Set the book library destination to `/books`.
-   Under **Settings → Processing**, set the Calibre import program to
-   `/usr/bin/calibredb` so completed books are added to the shared Calibre
-   database. The image includes the LinuxServer Calibre mod for this command.
+   Under **Settings → Processing → Calibre**, set the content-server URL to
+   `http://calibre-content-server:8081`, then enter username `lazylibrarian`
+   and the password from the SOPS secret. Leave the `calibredb` import program
+   and Calibre auto-add directory unset; the authenticated content server
+   handles library writes.
    For a manual test, set the Alternate Import Folder to
    `/data/torrents/books`, import a test ebook you own, and verify it appears in
    Calibre-Web before enabling scheduled searches or downloaders. If you later
    enable downloads, use qBittorrent at `qbittorrent:8080` and stage them in
    `/data/torrents/books`.
-7. Calibre-Web and LazyLibrarian both update the same Calibre database; avoid
+8. Calibre-Web and LazyLibrarian both update the same Calibre database; avoid
    uploading books in Calibre-Web while LazyLibrarian is importing.
-8. **Jellyfin**: add libraries pointing at `/media/movies` and `/media/tv`.
-9. **Import legacy**: in Radarr/Sonarr use *Library Import* / *Manual Import*
+9. **Jellyfin**: add libraries pointing at `/media/movies` and `/media/tv`.
+10. **Import legacy**: in Radarr/Sonarr use *Library Import* / *Manual Import*
    against `/data/torrents/legacy` — files hardlink into `/data/media/*`.
 
 ## Jellyfin 12 upgrade

@@ -5,11 +5,13 @@ namespace: media
 resources:
   - namespace.yaml
   - pvc.yaml
+  - calibre-content-server-secret.sops.yaml
   - qbittorrent.yaml
   - prowlarr.yaml
   - sonarr.yaml
   - radarr.yaml
   - calibre-web.yaml
+  - calibre-content-server.yaml
   - lazylibrarian.yaml
   - byparr.yaml
   - jellyseerr.yaml

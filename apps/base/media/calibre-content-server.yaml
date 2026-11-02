@@ -1,0 +1,73 @@
+# Headless Calibre content server for LazyLibrarian. It is ClusterIP-only:
+# Calibre-Web remains the client-facing OPDS service.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: calibre-content-server
+  namespace: media
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: "5.3.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              repository: lscr.io/linuxserver/calibre
+              tag: "9.17.0"
+            env:
+              HOME: /config
+              TZ: Europe/Budapest
+              CALIBRE_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: calibre-content-server-auth
+                    key: username
+              CALIBRE_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: calibre-content-server-auth
+                    key: password
+            command:
+              - /bin/bash
+              - -ec
+            args:
+              - |
+                calibre-server --userdb /config/users.sqlite --manage-users -- add "$CALIBRE_USER" "$CALIBRE_PASSWORD" >/dev/null 2>&1 ||
+                  calibre-server --userdb /config/users.sqlite --manage-users -- chpass "$CALIBRE_USER" "$CALIBRE_PASSWORD" >/dev/null 2>&1
+                exec calibre-server --listen-on 0.0.0.0 --port 8081 --enable-auth --userdb /config/users.sqlite /books
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+    service:
+      main:
+        controller: main
+        type: ClusterIP
+        ports:
+          http:
+            port: 8081
+    persistence:
+      config:
+        existingClaim: calibre-content-server-config
+        globalMounts:
+          - path: /config
+      library:
+        existingClaim: calibre-library
+        globalMounts:
+          - path: /books

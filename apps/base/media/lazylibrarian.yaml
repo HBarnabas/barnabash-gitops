@@ -1,5 +1,5 @@
-# LazyLibrarian book manager. It shares the Calibre-Web library and media
-# downloads volume; keep the UI private to LAN/Headscale.
+# LazyLibrarian book manager. It shares the Calibre content-server library and
+# media downloads volume; keep the UI private to LAN/Headscale.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -27,7 +27,6 @@ spec:
               PUID: "1000"
               PGID: "1000"
               TZ: Europe/Budapest
-              DOCKER_MODS: linuxserver/mods:universal-calibre
             resources:
               requests:
                 cpu: 50m
