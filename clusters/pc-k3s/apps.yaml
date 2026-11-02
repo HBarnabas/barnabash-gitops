@@ -15,7 +15,5 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./apps/pc-k3s
-  # Temporarily keep false while resources transfer to child Kustomizations.
-  # Re-enable after verifying with `flux tree` that workloads moved to them.
-  prune: false
+  prune: true
   wait: false
