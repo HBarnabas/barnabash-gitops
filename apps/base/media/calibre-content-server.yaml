@@ -48,7 +48,7 @@ spec:
               - |
                 calibre-server --userdb /config/users.sqlite --manage-users -- add "$CALIBRE_USER" "$CALIBRE_PASSWORD" >/dev/null 2>&1 ||
                   calibre-server --userdb /config/users.sqlite --manage-users -- chpass "$CALIBRE_USER" "$CALIBRE_PASSWORD" >/dev/null 2>&1
-                exec calibre-server --listen-on 0.0.0.0 --port 8081 --enable-auth --userdb /config/users.sqlite /books
+                exec calibre-server --disable-use-bonjour --listen-on 0.0.0.0 --port 8081 --enable-auth --userdb /config/users.sqlite /books
             resources:
               requests:
                 cpu: 50m

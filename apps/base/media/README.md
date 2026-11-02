@@ -15,7 +15,8 @@ LAN:
 | LazyLibrarian | http://lazylibrarian.home.barnabash.com or :30529 | 30529    |
 
 The Calibre content server is internal-only at
-`http://calibre-content-server:8081`; it has no Ingress or NodePort.
+`http://calibre-content-server:8081`; it has no Ingress or NodePort. Bonjour
+advertising is disabled because Kubernetes clients use the Service DNS name.
 
 ## Storage layout (single filesystem = instant hardlinks)
 
