@@ -44,8 +44,7 @@ spec:
                 cpu: 250m
                 memory: 512Mi
               limits:
-                # Cap CPU so a solve can't peg every core and freeze the node
-                # (Pi 5 has 4 cores; leave one for k3s/system/SSH).
+                # Cap CPU so a solve can't peg every core and freeze the node.
                 cpu: "3"
                 # A single Firefox/camoufox instance plus /dev/shm.
                 memory: 2Gi

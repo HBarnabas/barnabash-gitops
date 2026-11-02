@@ -1,7 +1,7 @@
 ---
 # Jellyfin — media server (private, VPN-only). Reads the media/ subtree only
 # (mounted read side at /media -> /media/movies, /media/tv). Reach it over the
-# WireGuard tunnel at http://<pi-ip>:30096.
+# Headscale mesh or LAN at http://<node-ip>:30096.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -67,4 +67,4 @@ spec:
       limits:
         memory: 1Gi
     # Hardware transcoding (VAAPI/QSV) needs /dev/dri + render group -- only on a
-    # GPU-capable node. Leave off on the Pi; enable via a pc-k3s overlay later.
+    # GPU-capable node. Enable only after configuring device access.

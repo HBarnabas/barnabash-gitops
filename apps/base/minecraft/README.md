@@ -27,5 +27,4 @@ Bedrock/console players join, then expose UDP 19132.
 
 ## Tuning
 
-The Pi should stay around `memory: 2G`. The `pc-k3s` overlay bumps memory
-for more players / render distance.
+The PC cluster uses `memory: 6G` for more players and render distance.

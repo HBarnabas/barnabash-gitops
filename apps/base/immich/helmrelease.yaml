@@ -29,9 +29,8 @@ spec:
                   secretKeyRef:
                     name: immich-db
                     key: password
-              # Machine learning disabled for now to keep the Pi light while we
-              # set things up. Flip to "true" + machine-learning.enabled below to
-              # get smart search / face recognition later.
+              # Enable machine learning together with machine-learning.enabled
+              # below to get smart search and face recognition.
               IMMICH_MACHINE_LEARNING_ENABLED: "false"
 
     immich:
@@ -69,6 +68,6 @@ spec:
                   service:
                     identifier: main
 
-    # Off for now (heavy on a Pi). Enable later once the basics work.
+    # Off for now. Enable later once the basics work.
     machine-learning:
       enabled: false

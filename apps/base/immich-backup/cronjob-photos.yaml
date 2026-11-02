@@ -27,7 +27,7 @@ spec:
           # there is no write risk.
           containers:
             - name: rclone
-              image: rclone/rclone:1.75 # multi-arch (arm64 ok on the Pi)
+              image: rclone/rclone:1.75
               args:
                 - copy
                 - /data

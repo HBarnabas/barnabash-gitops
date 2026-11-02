@@ -133,6 +133,6 @@ Do not port-forward these services from the public internet.
 
 ## Optional: route torrent traffic through a VPN provider (later)
 
-Add a Gluetun sidecar to the qBittorrent controller (CyberGhost via WireGuard),
+Add a Gluetun sidecar to the qBittorrent controller (CyberGhost VPN),
 force qBittorrent's network through it with a kill-switch, and put the provider
 creds in a `*.sops.yaml` secret. Skipped for now to keep full 1 Gbps throughput.

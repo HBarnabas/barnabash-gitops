@@ -1,6 +1,5 @@
 ---
-# Application workloads for this cluster. Depends on infra-configs so that
-# ingress, TLS issuers and storage are ready before apps roll out.
+# App reconciliation definitions. Each workload is reconciled independently.
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -16,9 +15,7 @@ spec:
     kind: GitRepository
     name: flux-system
   path: ./apps/pc-k3s
-  prune: true
-  wait: true
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
+  # Temporarily keep false while resources transfer to child Kustomizations.
+  # Re-enable after verifying with `flux tree` that workloads moved to them.
+  prune: false
+  wait: false

@@ -23,7 +23,7 @@ spec:
   values:
     crds:
       enabled: true
-    # Small footprint that is fine on a Raspberry Pi and scales up on a PC.
+    # Small footprint for modest clusters, with room to scale on larger nodes.
     resources:
       requests:
         cpu: 10m

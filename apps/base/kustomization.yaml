@@ -2,14 +2,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - sources.yaml
+  - sources
   - media
   - minecraft
   - ddns
   - immich
   - immich-backup
   - headscale
-  # Retain the old WireGuard config and PVC for rollback; its Deployment is retired.
-  - wireguard
   - pi-hole
   # - monitoring

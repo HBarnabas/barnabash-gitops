@@ -1,19 +1,17 @@
 ---
+# Immich publishes current charts as OCI artifacts rather than a classic index.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: immich
   namespace: flux-system
 spec:
-  # Newer Immich charts (>= 0.13.x, app v3.x) are published only as OCI
-  # artifacts, not to the classic HTTP index. An OCIRepository points at the
-  # full chart path (incl. chart name) and a specific tag; the HelmRelease
-  # consumes it via chartRef.
   interval: 24h
   url: oci://ghcr.io/immich-app/immich-charts/immich
   ref:
     tag: "0.13.1"
 ---
+# Jellyfin's chart repository.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
@@ -23,6 +21,7 @@ spec:
   interval: 24h
   url: https://jellyfin.github.io/jellyfin-helm
 ---
+# Minecraft chart repository.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
@@ -32,8 +31,7 @@ spec:
   interval: 24h
   url: https://itzg.github.io/minecraft-server-charts
 ---
-# bjw-s app-template: a flexible generic chart used here for qBittorrent.
-# It's the de-facto standard for self-hosted apps that lack a good official chart.
+# bjw-s app-template is used by qBittorrent and other generic app workloads.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
