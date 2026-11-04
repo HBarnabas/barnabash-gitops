@@ -58,10 +58,10 @@ spec:
     service:
       main:
         controller: main
-        type: ClusterIP
+        type: NodePort
         ports:
           http:
-            port: 8081
+            port: 30081
     persistence:
       config:
         existingClaim: calibre-content-server-config
