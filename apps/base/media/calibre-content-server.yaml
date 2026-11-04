@@ -61,7 +61,7 @@ spec:
         type: NodePort
         ports:
           http:
-            port: 30081
+            port: 8081
     persistence:
       config:
         existingClaim: calibre-content-server-config
