@@ -23,7 +23,7 @@ spec:
               repository: tombursch/kitchenowl-web
               tag: "v0.8.1"
             env:
-              BACK_URL: http://127.0.0.1:5000
+              BACK_URL: 127.0.0.1:5000
             ports:
               - name: http
                 containerPort: 80
