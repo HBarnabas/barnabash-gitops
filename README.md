@@ -39,6 +39,7 @@ remains one reconciliation unit for now.
 | `apps-headscale` | Headscale |
 | `apps-immich` | Immich and its database |
 | `apps-immich-backup` | Immich backup jobs; depends on `apps-immich` |
+| `apps-kitchenowl` | KitchenOwl |
 | `apps-media` | Media namespace (kept grouped for now) |
 | `apps-minecraft` | Minecraft |
 | `apps-pi-hole` | Pi-hole |
@@ -100,7 +101,7 @@ No cluster needed to catch structural errors:
 
 ```sh
 kustomize build apps/pc-k3s
-for app in ddns headscale immich immich-backup media pi-hole minecraft sources; do
+for app in ddns headscale immich immich-backup kitchenowl media pi-hole minecraft sources; do
   kustomize build "apps/base/$app"
 done
 kustomize build apps/base

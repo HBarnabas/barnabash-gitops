@@ -1,0 +1,73 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kitchenowl
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: "5.3.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      automountServiceAccountToken: false
+    controllers:
+      main:
+        containers:
+          front:
+            image:
+              repository: tombursch/kitchenowl-web
+              tag: "0.8.1"
+            env:
+              BACK_URL: http://127.0.0.1:5000
+            ports:
+              - name: http
+                containerPort: 80
+                protocol: TCP
+          back:
+            image:
+              repository: tombursch/kitchenowl-backend
+              tag: "0.8.1"
+            env:
+              JWT_SECRET_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: kitchenowl
+                    key: JWT_SECRET_KEY
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+    service:
+      main:
+        controller: main
+        type: NodePort
+        ports:
+          http:
+            port: 80
+            targetPort: http
+            nodePort: 30301
+    ingress:
+      main:
+        className: traefik
+        hosts:
+          - host: kitchenowl.home.barnabash.com
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+    persistence:
+      data:
+        existingClaim: kitchenowl-data
+        advancedMounts:
+          main:
+            back:
+              - path: /data

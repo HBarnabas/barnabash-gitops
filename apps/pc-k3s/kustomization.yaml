@@ -5,6 +5,7 @@ resources:
   - sources.yaml
   - ddns.yaml
   - headscale.yaml
+  - kitchenowl.yaml
   - immich.yaml
   - immich-backup.yaml
   - media.yaml

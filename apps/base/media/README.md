@@ -64,7 +64,9 @@ sudo chown -R 1000:1000 /mnt/hdd/data
    `movies`, and `books` (save to their matching subdirectories). Grab the
    WebUI temp password from logs:
    `kubectl -n media logs deploy/qbittorrent | grep -i password`.
-2. **Prowlarr**: add indexers; add Sonarr and Radarr as apps (sync indexers).
+2. **Prowlarr**: add indexers; add Sonarr, Radarr, and LazyLibrarian under
+   **Settings → Apps** so their indexers sync. For LazyLibrarian, use
+   `http://lazylibrarian:5299` as the application URL and its API key from
    Byparr is a FlareSolverr-compatible **indexer proxy**, not an indexer:
    configure it under **Settings → Indexers → Indexer Proxies → FlareSolverr**
    with host `http://byparr:8191`, then test it. Give the proxy a tag such as

@@ -9,5 +9,6 @@ resources:
   - immich
   - immich-backup
   - headscale
+  - kitchenowl
   - pi-hole
   # - monitoring
