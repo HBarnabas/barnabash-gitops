@@ -21,7 +21,7 @@ spec:
           front:
             image:
               repository: tombursch/kitchenowl-web
-              tag: "0.8.1"
+              tag: "v0.8.1"
             env:
               BACK_URL: http://127.0.0.1:5000
             ports:
@@ -31,7 +31,7 @@ spec:
           back:
             image:
               repository: tombursch/kitchenowl-backend
-              tag: "0.8.1"
+              tag: "v0.8.1"
             env:
               JWT_SECRET_KEY:
                 valueFrom:
